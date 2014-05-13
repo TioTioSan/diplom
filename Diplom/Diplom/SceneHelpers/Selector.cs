@@ -236,7 +236,7 @@ namespace Diplom.SceneHelpers
             }
 
             BoundingFrustum bf = UnprojectRectangle(rect);
-            foreach (var entity in Engine.SceneEntities)
+            foreach (var entity in Engine.EntitySelectionPool)
             {
                 foreach (var vertex in entity.ControlVertices)
                 {
@@ -267,6 +267,55 @@ namespace Diplom.SceneHelpers
                             if (isObjPicked)
                             {
                                 Engine.VertexSelectionPool.Add(vertex);
+                            }
+                            break;
+                    }
+                }
+            }
+
+            if (selectionChanged)
+                Engine.SelectionChanged();
+        }
+
+        public static void SelectControlEdgeByRectangle(Rectangle rect)
+        {
+            bool selectionChanged = false;
+            if (Control.ModifierKeys != Keys.Control && Control.ModifierKeys != Keys.Alt)
+            {
+                Engine.EdgeSelectionPool.Clear();
+                selectionChanged = true;
+            }
+
+            BoundingFrustum bf = UnprojectRectangle(rect);
+            foreach (var entity in Engine.EntitySelectionPool)
+            {
+                foreach (var edge in entity.ControlEdges)
+                {
+                    bool isObjPicked = bf.Contains(edge.FirstVertex)!= ContainmentType.Disjoint || 
+                                       bf.Contains(edge.Center)!= ContainmentType.Disjoint || 
+                                       bf.Contains(edge.SecondVertex) != ContainmentType.Disjoint;
+                    bool isAlreadySelected = isObjPicked && Engine.EdgeSelectionPool.Contains(edge);
+
+                    switch (Control.ModifierKeys)
+                    {
+                        case Keys.Control:
+                            if (isObjPicked && !isAlreadySelected)
+                            {
+                                Engine.EdgeSelectionPool.Add(edge);
+                                selectionChanged = true;
+                            }
+                            break;
+                        case Keys.Alt:
+                            if (isAlreadySelected)
+                            {
+                                Engine.EdgeSelectionPool.Remove(edge);
+                                selectionChanged = true;
+                            }
+                            break;
+                        default:
+                            if (isObjPicked)
+                            {
+                                Engine.EdgeSelectionPool.Add(edge);
                             }
                             break;
                     }

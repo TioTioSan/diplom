@@ -13,19 +13,25 @@ namespace Diplom.SceneHelpers
     {
         private BasicEffect _effect;
         private Matrix _vertexWorld = Matrix.Identity;
-        private BoundingBox _boundingBox;
         private Color _usualColor = Color.Blue;
         private Color _highlightColor = Color.Red;
 
         private VertexPositionColor[] _vertexData;
 
-        public Vector3 FirstVertex { get; set; }
-        public Vector3 SecondVertex { get; set; }
+        public Vector3 FirstVertex 
+        {
+            get { return _vertexData[0].Position; }
+            set { _vertexData[0].Position = value; }
+        }
+        public Vector3 SecondVertex
+        {
+            get { return _vertexData[1].Position; }
+            set { _vertexData[1].Position = value; }
+        }
 
         public Vector3 Center { get { return (FirstVertex + SecondVertex) / 2; } }
         public float Length { get { return Vector3.Distance(FirstVertex, SecondVertex); } }
         public bool IsSelected { get { return Engine.EdgeSelectionPool.Contains(this); } }
-        public BoundingBox BoundingBox { get { return _boundingBox; } }
         public Matrix VertexWorld { get { return _vertexWorld; } }
 
         private ControlEdge()
@@ -35,8 +41,6 @@ namespace Diplom.SceneHelpers
 
             FirstVertex = new Vector3(0f);
             SecondVertex = new Vector3(0f);
-
-            //_boundingBox = Utils.CalculateBoundingBox(Engine.VerticesOfControlVertex);
         }
 
         public ControlEdge(Vector3 firstVertex, Vector3 secondVertex)
@@ -53,9 +57,6 @@ namespace Diplom.SceneHelpers
         {
             FirstVertex += delta;
             SecondVertex += delta;
-
-            _vertexData[0].Position += delta;
-            _vertexData[1].Position += delta;
         }
 
         public void Draw()

@@ -231,7 +231,61 @@ namespace Diplom
                         if (_vertexData[i].Position == contrVertex.Position)
                             _vertexData[i].Position += delta;
                     }
+
+                    for (int i = 0; i < _controlEdges.Count; i++)
+                    {
+                        if (_controlEdges[i].FirstVertex == contrVertex.Position)
+                        {
+                            _controlEdges[i].FirstVertex += delta;
+                            continue;
+                        }
+                        if (_controlEdges[i].SecondVertex == contrVertex.Position)
+                            _controlEdges[i].SecondVertex += delta;
+                    }
+
                     contrVertex.Position += delta;
+                }
+            }
+
+            RecalcBoundingBox();
+        }
+
+        public void TranslateControlEdges(Vector3 delta)
+        {
+            foreach (var contrEdge in _controlEdges)
+            {
+                if (contrEdge.IsSelected)
+                {
+                    for (int i = 0; i < _vertexPositions.Length; i++)
+                    {
+                        if (_vertexPositions[i] == contrEdge.FirstVertex || _vertexPositions[i] == contrEdge.SecondVertex)
+                            _vertexPositions[i] += delta;
+                    }
+                    for (int i = 0; i < _vertexData.Length; i++)
+                    {
+                        if (_vertexData[i].Position == contrEdge.FirstVertex || _vertexData[i].Position == contrEdge.SecondVertex)
+                            _vertexData[i].Position += delta;
+                    }
+
+                    for (int i = 0; i < _controlVertices.Count; i++)
+                    {
+                        if (_controlVertices[i].Position == contrEdge.FirstVertex || _controlVertices[i].Position == contrEdge.SecondVertex)
+                            _controlVertices[i].Position += delta;
+                    }
+
+                    for (int i = 0; i < _controlEdges.Count; i++)
+                    {
+                        if (_controlEdges[i].IsSelected)
+                            continue;
+
+                        if (_controlEdges[i].FirstVertex == contrEdge.FirstVertex || _controlEdges[i].FirstVertex == contrEdge.SecondVertex)
+                            _controlEdges[i].FirstVertex += delta;
+                        if (_controlEdges[i].SecondVertex == contrEdge.FirstVertex || _controlEdges[i].SecondVertex == contrEdge.SecondVertex)
+                            _controlEdges[i].SecondVertex += delta;
+                    }
+
+                    contrEdge.FirstVertex += delta;
+                    contrEdge.SecondVertex += delta;
                 }
             }
 

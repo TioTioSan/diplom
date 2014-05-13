@@ -129,6 +129,10 @@ namespace Diplom.SceneHelpers
                     }
                     break;
                 case SubObjectMode.Edge:
+                    foreach (var item in Engine.EntitySelectionPool)
+                    {
+                        item.TranslateControlEdges(delta);
+                    }
                     break;
                 case SubObjectMode.Triangle:
                     break;

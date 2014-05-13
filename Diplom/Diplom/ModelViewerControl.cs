@@ -96,6 +96,7 @@ namespace Diplom
                         Selector.SelectControlVertexByRectangle(_selectionRect);
                         break;
                     case SubObjectMode.Edge:
+                        Selector.SelectControlEdgeByRectangle(_selectionRect);
                         break;
                     case SubObjectMode.Triangle:
                         break;
