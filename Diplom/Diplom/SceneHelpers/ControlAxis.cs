@@ -393,6 +393,10 @@ namespace Diplom.SceneHelpers
                     if (Engine.VertexSelectionPool.Count != 0)
                         newPos = Utils.GetCenter(Engine.VertexSelectionPool);
                     break;
+                case SubObjectMode.Edge:
+                    if (Engine.EdgeSelectionPool.Count != 0)
+                        newPos = Utils.GetCenter(Engine.EdgeSelectionPool);
+                    break;
             }
             if (newPos.HasValue)
             {

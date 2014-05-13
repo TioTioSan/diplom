@@ -78,8 +78,12 @@ namespace Diplom
         private VertexPositionNormalTexture[] _vertexData;
         private PrimitiveType _primitiveType;
         private int _primitiveCount;
+
         private List<ControlVertex> _controlVertices;
         public List<ControlVertex> ControlVertices { get { return _controlVertices; } }
+
+        private List<ControlEdge> _controlEdges;
+        public List<ControlEdge> ControlEdges { get { return _controlEdges; } }
         #endregion
 
         public SceneEntity(Model model, Effect effect, GraphicsDevice graphicsDevice)
@@ -103,7 +107,7 @@ namespace Diplom
         //    _primitiveType = primitive.PrimitiveType;
         //    _primitiveCount = primitive.PrimitiveCount;
         //}
-        public SceneEntity(Primitive primitive, GraphicsDevice graphicsDevice)
+        public SceneEntity(PrimitiveBase primitive, GraphicsDevice graphicsDevice)
         {
             _basicEffect = new BasicEffect(graphicsDevice);
             _basicEffect.EnableDefaultLighting();
@@ -116,17 +120,17 @@ namespace Diplom
             _primitiveType = primitive.PrimitiveType;
             _primitiveCount = primitive.PrimitiveCount;
 
-            _controlVertices = new List<ControlVertex>(8)
-                {
-                    new ControlVertex(_vertexPositions[0]),
-                    new ControlVertex(_vertexPositions[1]),
-                    new ControlVertex(_vertexPositions[2]),
-                    new ControlVertex(_vertexPositions[3]),
-                    new ControlVertex(_vertexPositions[4]),
-                    new ControlVertex(_vertexPositions[5]),
-                    new ControlVertex(_vertexPositions[6]),
-                    new ControlVertex(_vertexPositions[7])
-                };
+            _controlVertices = new List<ControlVertex>();
+            foreach (Vector3 vert in _vertexPositions)
+            {
+                _controlVertices.Add(new ControlVertex(vert));
+            }
+
+            _controlEdges = new List<ControlEdge>(); primitive.EdgeVertexIndexes.ToList();
+            foreach (Tuple<int, int> tuple in primitive.EdgeVertexIndexes)
+            {
+                _controlEdges.Add(new ControlEdge(_vertexPositions[tuple.Item1], _vertexPositions[tuple.Item2]));
+            }
 
             RecalcCenter();
             RecalcBoundingBox();
@@ -189,9 +193,13 @@ namespace Diplom
         {
             _position += delta;
             _center += delta;
+            for (int i = 0; i < _controlEdges.Count; i++)
+            {
+                _controlEdges[i].Translate(delta);
+            }
             for (int i = 0; i < _controlVertices.Count; i++)
             {
-                _controlVertices[i].Position += delta;
+                _controlVertices[i].Translate(delta);
             }
             for (int i = 0; i < _vertexPositions.Length; i++)
             {
@@ -237,15 +245,7 @@ namespace Diplom
 
         private void DrawEdges()
         {
-            _basicEffect.World = Engine.ActiveCamera.WorldMatrix;
-            _basicEffect.View = Engine.ActiveCamera.ViewMatrix;
-            _basicEffect.Projection = Engine.ActiveCamera.ProjectionMatrix;
-
-            _basicEffect.DiffuseColor = Color.Blue.ToVector3();
-
-            _basicEffect.CurrentTechnique.Passes[0].Apply();
-
-            _graphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, _vertexData, 0, _primitiveCount);
+            _controlEdges.ForEach(x => x.Draw());
         }
 
         private void DrawSelectionBox()

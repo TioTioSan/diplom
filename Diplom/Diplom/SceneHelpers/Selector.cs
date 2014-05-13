@@ -129,6 +129,59 @@ namespace Diplom.SceneHelpers
             }
         }
 
+        public static void PickControlEdge()
+        {
+            ControlEdge obj = null;
+
+            foreach (var entity in Engine.EntitySelectionPool)
+            {
+                foreach (var edge in entity.ControlEdges)
+                {
+                    if (edge.Select(Engine.CurrentMouseRay))
+                        obj = edge;
+                }
+            }
+
+            bool isObjPicked = obj != null;
+            bool isAlreadySelected = isObjPicked && Engine.EdgeSelectionPool.Contains(obj);
+
+            switch (Control.ModifierKeys)
+            {
+                case Keys.Control:
+                    if (isAlreadySelected)
+                    {
+                        Engine.EdgeSelectionPool.Remove(obj);
+                        Engine.SelectionChanged();
+                    }
+                    else if (isObjPicked)
+                    {
+                        Engine.EdgeSelectionPool.Add(obj);
+                        Engine.SelectionChanged();
+                    }
+                    break;
+                case Keys.Alt:
+                    if (isAlreadySelected)
+                    {
+                        Engine.EdgeSelectionPool.Remove(obj);
+                        Engine.SelectionChanged();
+                    }
+                    break;
+                default:
+                    if (isObjPicked)
+                    {
+                        Engine.EdgeSelectionPool.Clear();
+                        Engine.EdgeSelectionPool.Add(obj);
+                        Engine.SelectionChanged();
+                    }
+                    else if (Engine.EdgeSelectionPool.Count != 0)
+                    {
+                        Engine.EdgeSelectionPool.Clear();
+                        Engine.SelectionChanged();
+                    }
+                    break;
+            }
+        }
+
         public static void SelectEntityByRectangle(Rectangle rect)
         {
             bool selectionChanged = false;

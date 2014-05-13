@@ -14,6 +14,12 @@ namespace Diplom
 {
     public static class Engine
     {
+        // Custom rasterizer state for drawing in wireframe.
+        public static RasterizerState WireFrame = new RasterizerState
+        {
+            FillMode = FillMode.WireFrame
+        };
+
         public static GraphicsDevice ActiveGraphicsDevice { get; set; }
         public static Camera ActiveCamera { get; set; }
         public static SpriteBatch SpriteBatch { get; set; }
@@ -53,6 +59,7 @@ namespace Diplom
         public static List<SceneEntity> SceneEntities = new List<SceneEntity>();
         public static List<SceneEntity> EntitySelectionPool = new List<SceneEntity>();
         public static List<ControlVertex> VertexSelectionPool = new List<ControlVertex>();
+        public static List<ControlEdge> EdgeSelectionPool = new List<ControlEdge>();
 
 
         public static void Draw(Camera camera)
@@ -94,6 +101,24 @@ namespace Diplom
                     {
                         ActiveControlAxis.IsEnabled = true;
                         ActiveControlAxis.Position = Utils.GetCenter(VertexSelectionPool);
+                        ActiveControlAxis.SetDirections(Vector3.Up, Vector3.Forward);
+                    }
+                    else
+                    {
+                        ActiveControlAxis.IsEnabled = false;
+                    }
+                    break;
+                case SubObjectMode.Edge:
+                    if (EdgeSelectionPool.Count == 1)
+                    {
+                        ActiveControlAxis.IsEnabled = true;
+                        ActiveControlAxis.Position = EdgeSelectionPool[0].Center;
+                        ActiveControlAxis.SetDirections(Vector3.Up, Vector3.Forward);
+                    }
+                    else if (EdgeSelectionPool.Count > 1)
+                    {
+                        ActiveControlAxis.IsEnabled = true;
+                        ActiveControlAxis.Position = Utils.GetCenter(EdgeSelectionPool);
                         ActiveControlAxis.SetDirections(Vector3.Up, Vector3.Forward);
                     }
                     else

@@ -27,7 +27,7 @@ namespace Diplom
         private string GetContentPath(string fileName)
         {
             string assemblyLocation = Assembly.GetExecutingAssembly().Location;
-            string relativePath = Path.Combine(assemblyLocation, "../../../../Content/", fileName);
+            string relativePath = Path.Combine(assemblyLocation, "../Content/", fileName);
             return Path.GetFullPath(relativePath);
         }
 

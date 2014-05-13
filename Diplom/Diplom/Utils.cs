@@ -60,6 +60,11 @@ namespace Diplom
             return controlVertices.Average(x => x.Position);
         }
 
+        public static Vector3 GetCenter(IEnumerable<ControlEdge> controlEdges)
+        {
+            return controlEdges.Average(x => x.Center);
+        }
+
         public static Vector3 GetCenter(IEnumerable<Vector3> vertices)
         {
             return vertices.Average(x => x);

@@ -172,6 +172,7 @@ namespace Diplom
                     Selector.PickControlVertex();
                     break;
                 case SubObjectMode.Edge:
+                    Selector.PickControlEdge();
                     break;
                 case SubObjectMode.Triangle:
                     break;

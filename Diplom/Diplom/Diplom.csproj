@@ -82,6 +82,7 @@
     <Compile Include="Engine.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="ErrorLogger.cs" />
+    <Compile Include="SceneHelpers\ControlEdge.cs" />
     <Compile Include="SceneHelpers\HelpersGeometry.cs" />
     <Compile Include="SceneHelpers\GridComponent.cs" />
     <Compile Include="Intefaces\IDrawable.cs" />
@@ -121,6 +122,16 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="Content\cat.tga" />
+    <None Include="Content\Cats.fbx" />
+    <None Include="Content\Cylinder.fbx" />
+    <None Include="Content\DottedLine.tga">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Content\SceneEntityEffect.fx" />
+    <None Include="Content\SpaceShip.fbx" />
+    <None Include="Content\Sphere.fbx" />
+    <None Include="Content\wedge_p2_diff_v1.tga" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

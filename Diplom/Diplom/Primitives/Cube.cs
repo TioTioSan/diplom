@@ -8,7 +8,7 @@ using Diplom.SceneHelpers;
 
 namespace Diplom.Primitives
 {
-    public class Cube : Primitive
+    public class Cube : PrimitiveBase
     {
         public Cube()
         {
@@ -26,6 +26,27 @@ namespace Diplom.Primitives
             _textureCoords = new Vector2[4]
                 {
                     new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(1f, 1f), new Vector2(0f, 1f)
+                };
+            _edgeVertexIndexes = new Tuple<int, int>[18] 
+                { 
+                    new Tuple<int,int>(0,1),
+                    new Tuple<int,int>(0,3),
+                    new Tuple<int,int>(0,4),
+                    new Tuple<int,int>(0,7),
+                    new Tuple<int,int>(6,2),
+                    new Tuple<int,int>(6,3),
+                    new Tuple<int,int>(6,4),
+                    new Tuple<int,int>(6,5),
+                    new Tuple<int,int>(6,7),
+                    new Tuple<int,int>(1,2),
+                    new Tuple<int,int>(1,3),
+                    new Tuple<int,int>(1,4),
+                    new Tuple<int,int>(1,5),
+                    new Tuple<int,int>(7,3),
+                    new Tuple<int,int>(7,4),
+                    new Tuple<int,int>(2,3),
+                    new Tuple<int,int>(2,5),
+                    new Tuple<int,int>(4,5),
                 };
             _vertexData = new VertexPositionNormalTexture[36]
                 {
