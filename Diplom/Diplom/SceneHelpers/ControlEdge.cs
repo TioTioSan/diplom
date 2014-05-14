@@ -75,7 +75,8 @@ namespace Diplom.SceneHelpers
 
         public bool Select(Ray ray)
         {
-            Plane plane = new Plane(FirstVertex, SecondVertex, Vector3.Zero);
+            Vector3 crossVector = Vector3.Cross(FirstVertex - SecondVertex, ray.Position - SecondVertex);
+            Plane plane = new Plane(FirstVertex, SecondVertex, crossVector + SecondVertex);
             float? dist = ray.Intersects(plane);
 
             if (!dist.HasValue)
