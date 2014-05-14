@@ -82,6 +82,7 @@
     <Compile Include="Engine.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="ErrorLogger.cs" />
+    <Compile Include="SceneHelpers\ControlTriangle.cs" />
     <Compile Include="SceneHelpers\ControlEdge.cs" />
     <Compile Include="SceneHelpers\HelpersGeometry.cs" />
     <Compile Include="SceneHelpers\GridComponent.cs" />

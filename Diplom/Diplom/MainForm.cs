@@ -139,6 +139,9 @@ namespace Diplom
                 case Keys.D3:
                     Engine.ActiveSubObjectMode = SubObjectMode.Edge;
                     break;
+                case Keys.D4:
+                    Engine.ActiveSubObjectMode = SubObjectMode.Triangle;
+                    break;
             }
         }
     }

@@ -21,6 +21,9 @@ namespace Diplom.Primitives
 
         protected Tuple<int,int>[] _edgeVertexIndexes;
         public Tuple<int, int>[] EdgeVertexIndexes { get { return _edgeVertexIndexes; } }
+
+        protected Tuple<int, int, int>[] _triangleVertexIndexes;
+        public Tuple<int, int, int>[] TriangleVertexIndexes { get { return _triangleVertexIndexes; } }
         
         protected Vector3[] _normals;
         public Vector3[] Normals { get { return _normals; } }

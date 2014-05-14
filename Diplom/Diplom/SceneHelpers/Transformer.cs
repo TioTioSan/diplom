@@ -135,6 +135,10 @@ namespace Diplom.SceneHelpers
                     }
                     break;
                 case SubObjectMode.Triangle:
+                    foreach (var item in Engine.EntitySelectionPool)
+                    {
+                        item.TranslateControlTriangles(delta);
+                    }
                     break;
                 default:
                     break;

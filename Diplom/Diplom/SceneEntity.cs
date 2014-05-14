@@ -84,6 +84,9 @@ namespace Diplom
 
         private List<ControlEdge> _controlEdges;
         public List<ControlEdge> ControlEdges { get { return _controlEdges; } }
+
+        private List<ControlTriangle> _controlTriangles;
+        public List<ControlTriangle> ControlTriangles { get { return _controlTriangles; } }
         #endregion
 
         public SceneEntity(Model model, Effect effect, GraphicsDevice graphicsDevice)
@@ -126,10 +129,16 @@ namespace Diplom
                 _controlVertices.Add(new ControlVertex(vert));
             }
 
-            _controlEdges = new List<ControlEdge>(); primitive.EdgeVertexIndexes.ToList();
+            _controlEdges = new List<ControlEdge>();
             foreach (Tuple<int, int> tuple in primitive.EdgeVertexIndexes)
             {
                 _controlEdges.Add(new ControlEdge(_vertexPositions[tuple.Item1], _vertexPositions[tuple.Item2]));
+            }
+
+            _controlTriangles = new List<ControlTriangle>();
+            foreach (Tuple<int, int, int> tuple in primitive.TriangleVertexIndexes)
+            {
+                _controlTriangles.Add(new ControlTriangle(_vertexPositions[tuple.Item1], _vertexPositions[tuple.Item2], _vertexPositions[tuple.Item3]));
             }
 
             RecalcCenter();
@@ -170,22 +179,19 @@ namespace Diplom
 
             if (Engine.EntitySelectionPool.Contains(this))
             {
-                DrawSelectionBox();
                 switch (Engine.ActiveSubObjectMode)
                 {
-                    case SubObjectMode.None:
-                        break;
                     case SubObjectMode.Vertex:
                         DrawConrtolVertices();
                         break;
                     case SubObjectMode.Edge:
-                        DrawEdges();
+                        DrawControlEdges();
                         break;
                     case SubObjectMode.Triangle:
-                        break;
-                    default:
+                        DrawControlTriangles();
                         break;
                 }
+                DrawSelectionBox();
             }
         }
 
@@ -193,6 +199,10 @@ namespace Diplom
         {
             _position += delta;
             _center += delta;
+            for (int i = 0; i < _controlTriangles.Count; i++)
+            {
+                _controlTriangles[i].Translate(delta);
+            }
             for (int i = 0; i < _controlEdges.Count; i++)
             {
                 _controlEdges[i].Translate(delta);
@@ -231,7 +241,6 @@ namespace Diplom
                         if (_vertexData[i].Position == contrVertex.Position)
                             _vertexData[i].Position += delta;
                     }
-
                     for (int i = 0; i < _controlEdges.Count; i++)
                     {
                         if (_controlEdges[i].FirstVertex == contrVertex.Position)
@@ -242,12 +251,28 @@ namespace Diplom
                         if (_controlEdges[i].SecondVertex == contrVertex.Position)
                             _controlEdges[i].SecondVertex += delta;
                     }
+                    for (int i = 0; i < _controlTriangles.Count; i++)
+                    {
+                        if (_controlTriangles[i].FirstVertex == contrVertex.Position)
+                        {
+                            _controlTriangles[i].FirstVertex += delta;
+                            continue;
+                        }
+                        if (_controlTriangles[i].SecondVertex == contrVertex.Position)
+                        {
+                            _controlTriangles[i].SecondVertex += delta;
+                            continue;
+                        }
+                        if (_controlTriangles[i].ThirdVertex == contrVertex.Position)
+                            _controlTriangles[i].ThirdVertex += delta;
+                    }
 
                     contrVertex.Position += delta;
                 }
             }
 
             RecalcBoundingBox();
+            RecalcNormals();
         }
 
         public void TranslateControlEdges(Vector3 delta)
@@ -272,7 +297,15 @@ namespace Diplom
                         if (_controlVertices[i].Position == contrEdge.FirstVertex || _controlVertices[i].Position == contrEdge.SecondVertex)
                             _controlVertices[i].Position += delta;
                     }
-
+                    for (int i = 0; i < _controlTriangles.Count; i++)
+                    {
+                        if (_controlTriangles[i].FirstVertex == contrEdge.FirstVertex || _controlTriangles[i].FirstVertex == contrEdge.SecondVertex)
+                            _controlTriangles[i].FirstVertex += delta;
+                        if (_controlTriangles[i].SecondVertex == contrEdge.FirstVertex || _controlTriangles[i].SecondVertex == contrEdge.SecondVertex)
+                            _controlTriangles[i].SecondVertex += delta;
+                        if (_controlTriangles[i].ThirdVertex == contrEdge.FirstVertex || _controlTriangles[i].ThirdVertex == contrEdge.SecondVertex)
+                            _controlTriangles[i].ThirdVertex += delta;
+                    }
                     for (int i = 0; i < _controlEdges.Count; i++)
                     {
                         if (_controlEdges[i].IsSelected)
@@ -290,16 +323,91 @@ namespace Diplom
             }
 
             RecalcBoundingBox();
+            RecalcNormals();
         }
+
+        public void TranslateControlTriangles(Vector3 delta)
+        {
+            foreach (var contrTrn in _controlTriangles)
+            {
+                if (contrTrn.IsSelected)
+                {
+                    for (int i = 0; i < _vertexPositions.Length; i++)
+                    {
+                        if (_vertexPositions[i] == contrTrn.FirstVertex || 
+                            _vertexPositions[i] == contrTrn.SecondVertex || 
+                            _vertexPositions[i] == contrTrn.ThirdVertex)
+                            _vertexPositions[i] += delta;
+                    }
+                    for (int i = 0; i < _vertexData.Length; i++)
+                    {
+                        if (_vertexData[i].Position == contrTrn.FirstVertex || 
+                            _vertexData[i].Position == contrTrn.SecondVertex || 
+                            _vertexData[i].Position == contrTrn.ThirdVertex)
+                            _vertexData[i].Position += delta;
+                    }
+
+                    for (int i = 0; i < _controlVertices.Count; i++)
+                    {
+                        if (_controlVertices[i].Position == contrTrn.FirstVertex || 
+                            _controlVertices[i].Position == contrTrn.SecondVertex || 
+                            _controlVertices[i].Position == contrTrn.ThirdVertex)
+                            _controlVertices[i].Position += delta;
+                    }
+                    for (int i = 0; i < _controlEdges.Count; i++)
+                    {
+                        if (_controlEdges[i].FirstVertex == contrTrn.FirstVertex || 
+                            _controlEdges[i].FirstVertex == contrTrn.SecondVertex ||
+                            _controlEdges[i].FirstVertex == contrTrn.ThirdVertex)
+                            _controlEdges[i].FirstVertex += delta;
+                        if (_controlEdges[i].SecondVertex == contrTrn.FirstVertex ||
+                            _controlEdges[i].SecondVertex == contrTrn.SecondVertex ||
+                            _controlEdges[i].SecondVertex == contrTrn.ThirdVertex)
+                            _controlEdges[i].SecondVertex += delta;
+                    }
+                    for (int i = 0; i < _controlTriangles.Count; i++)
+                    {
+                        if (_controlTriangles[i].IsSelected)
+                            continue;
+
+                        if (_controlTriangles[i].FirstVertex == contrTrn.FirstVertex || 
+                            _controlTriangles[i].FirstVertex == contrTrn.SecondVertex ||
+                            _controlTriangles[i].FirstVertex == contrTrn.ThirdVertex)
+                            _controlTriangles[i].FirstVertex += delta;
+                        if (_controlTriangles[i].SecondVertex == contrTrn.FirstVertex || 
+                            _controlTriangles[i].SecondVertex == contrTrn.SecondVertex ||
+                            _controlTriangles[i].SecondVertex == contrTrn.ThirdVertex)
+                            _controlTriangles[i].SecondVertex += delta;
+                        if (_controlTriangles[i].ThirdVertex == contrTrn.FirstVertex || 
+                            _controlTriangles[i].ThirdVertex == contrTrn.SecondVertex ||
+                            _controlTriangles[i].ThirdVertex == contrTrn.ThirdVertex)
+                            _controlTriangles[i].ThirdVertex += delta;
+                    }                    
+
+                    contrTrn.FirstVertex += delta;
+                    contrTrn.SecondVertex += delta;
+                    contrTrn.ThirdVertex += delta;
+                }
+            }
+
+            RecalcBoundingBox();
+            RecalcNormals();
+        }
+
 
         private void DrawConrtolVertices()
         {
             _controlVertices.ForEach(x => x.Draw());
         }
 
-        private void DrawEdges()
+        private void DrawControlEdges()
         {
             _controlEdges.ForEach(x => x.Draw());
+        }
+
+        private void DrawControlTriangles()
+        {
+            _controlTriangles.ForEach(x => x.Draw());
         }
 
         private void DrawSelectionBox()
@@ -504,6 +612,19 @@ namespace Diplom
             for (int i = 0; i < _vertexPositions.Length; i++)
             {
                 _center += _vertexPositions[i] / _vertexPositions.Length;
+            }
+        }
+
+        private void RecalcNormals()
+        {
+            _center = Vector3.Zero;
+            for (int i = 0; i < _vertexData.Length; i += 3)
+            {
+                Vector3 normal = Vector3.Cross(_vertexData[i + 2].Position - _vertexData[i].Position, _vertexData[i + 1].Position - _vertexData[i].Position);
+                normal.Normalize();
+                _vertexData[i].Normal = normal;
+                _vertexData[i+1].Normal = normal;
+                _vertexData[i+2].Normal = normal;
             }
         }
     }

@@ -182,6 +182,64 @@ namespace Diplom.SceneHelpers
             }
         }
 
+        public static void PickControlTriangle()
+        {
+            float closest = float.MaxValue;
+            ControlTriangle obj = null;
+
+            foreach (var entity in Engine.EntitySelectionPool)
+            {
+                foreach (var tngl in entity.ControlTriangles)
+                {
+                    float? intersection = Utils.RayIntersectsTriangle(Engine.CurrentMouseRay, tngl.FirstVertex, tngl.SecondVertex, tngl.ThirdVertex);
+                    if (intersection.HasValue && intersection < closest)
+                    {
+                        obj = tngl;
+                        closest = intersection.Value;
+                    }
+                }
+            }
+
+            bool isObjPicked = obj != null;
+            bool isAlreadySelected = isObjPicked && Engine.TriangleSelectionPool.Contains(obj);
+
+            switch (Control.ModifierKeys)
+            {
+                case Keys.Control:
+                    if (isAlreadySelected)
+                    {
+                        Engine.TriangleSelectionPool.Remove(obj);
+                        Engine.SelectionChanged();
+                    }
+                    else if (isObjPicked)
+                    {
+                        Engine.TriangleSelectionPool.Add(obj);
+                        Engine.SelectionChanged();
+                    }
+                    break;
+                case Keys.Alt:
+                    if (isAlreadySelected)
+                    {
+                        Engine.TriangleSelectionPool.Remove(obj);
+                        Engine.SelectionChanged();
+                    }
+                    break;
+                default:
+                    if (isObjPicked)
+                    {
+                        Engine.TriangleSelectionPool.Clear();
+                        Engine.TriangleSelectionPool.Add(obj);
+                        Engine.SelectionChanged();
+                    }
+                    else if (Engine.TriangleSelectionPool.Count != 0)
+                    {
+                        Engine.TriangleSelectionPool.Clear();
+                        Engine.SelectionChanged();
+                    }
+                    break;
+            }
+        }
+
         public static void SelectEntityByRectangle(Rectangle rect)
         {
             bool selectionChanged = false;
@@ -316,6 +374,56 @@ namespace Diplom.SceneHelpers
                             if (isObjPicked)
                             {
                                 Engine.EdgeSelectionPool.Add(edge);
+                            }
+                            break;
+                    }
+                }
+            }
+
+            if (selectionChanged)
+                Engine.SelectionChanged();
+        }
+
+        public static void SelectControlTriangleByRectangle(Rectangle rect)
+        {
+            bool selectionChanged = false;
+            if (Control.ModifierKeys != Keys.Control && Control.ModifierKeys != Keys.Alt)
+            {
+                Engine.TriangleSelectionPool.Clear();
+                selectionChanged = true;
+            }
+
+            BoundingFrustum bf = UnprojectRectangle(rect);
+            foreach (var entity in Engine.EntitySelectionPool)
+            {
+                foreach (var trngl in entity.ControlTriangles)
+                {
+                    bool isObjPicked = bf.Contains(trngl.FirstVertex) != ContainmentType.Disjoint ||
+                                       bf.Contains(trngl.SecondVertex) != ContainmentType.Disjoint ||
+                                       bf.Contains(trngl.ThirdVertex) != ContainmentType.Disjoint ||
+                                       bf.Contains(trngl.Center) != ContainmentType.Disjoint;
+                    bool isAlreadySelected = isObjPicked && Engine.TriangleSelectionPool.Contains(trngl);
+
+                    switch (Control.ModifierKeys)
+                    {
+                        case Keys.Control:
+                            if (isObjPicked && !isAlreadySelected)
+                            {
+                                Engine.TriangleSelectionPool.Add(trngl);
+                                selectionChanged = true;
+                            }
+                            break;
+                        case Keys.Alt:
+                            if (isAlreadySelected)
+                            {
+                                Engine.TriangleSelectionPool.Remove(trngl);
+                                selectionChanged = true;
+                            }
+                            break;
+                        default:
+                            if (isObjPicked)
+                            {
+                                Engine.TriangleSelectionPool.Add(trngl);
                             }
                             break;
                     }

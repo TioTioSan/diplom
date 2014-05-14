@@ -27,7 +27,7 @@ namespace Diplom.SceneHelpers
             _effect = new BasicEffect(Engine.ActiveGraphicsDevice) { VertexColorEnabled = true };
             Position = new Vector3(0f);
 
-            _boundingBox = Utils.CalculateBoundingBox(Engine.VerticesOfControlVertex);
+            _boundingBox = Utils.CalculateBoundingBox(Utils.VerticesOfControlVertex);
         }
 
         public ControlVertex(Vector3 position)
@@ -57,7 +57,7 @@ namespace Diplom.SceneHelpers
 
             _effect.CurrentTechnique.Passes[0].Apply();
 
-            Engine.ActiveGraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, Engine.VerticesOfControlVertex, 0, 12);
+            Engine.ActiveGraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, Utils.VerticesOfControlVertex, 0, 12);
         }
     }
 }

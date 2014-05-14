@@ -35,7 +35,7 @@ namespace Diplom
             Cube cube = new Cube();
             for (int i = 0; i < cube.VertexData.Length; i++)
             {
-                Engine.VerticesOfControlVertex[i] = new VertexPositionColor(cube.VertexData[i].Position * scale, Color.White);
+                Utils.VerticesOfControlVertex[i] = new VertexPositionColor(cube.VertexData[i].Position * scale, Color.White);
             }
 
             Engine.ActiveControlAxis = _controlAxis;
@@ -99,6 +99,7 @@ namespace Diplom
                         Selector.SelectControlEdgeByRectangle(_selectionRect);
                         break;
                     case SubObjectMode.Triangle:
+                        Selector.SelectControlTriangleByRectangle(_selectionRect);
                         break;
                     default:
                         break;
@@ -176,6 +177,7 @@ namespace Diplom
                     Selector.PickControlEdge();
                     break;
                 case SubObjectMode.Triangle:
+                    Selector.PickControlTriangle();
                     break;
                 default:
                     break;

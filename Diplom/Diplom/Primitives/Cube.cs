@@ -46,7 +46,22 @@ namespace Diplom.Primitives
                     new Tuple<int,int>(7,4),
                     new Tuple<int,int>(2,3),
                     new Tuple<int,int>(2,5),
-                    new Tuple<int,int>(4,5),
+                    new Tuple<int,int>(4,5)
+                };
+            _triangleVertexIndexes = new Tuple<int, int, int>[12]
+                {
+                    new Tuple<int, int, int>(0,1,3),
+                    new Tuple<int, int, int>(3,1,2),
+                    new Tuple<int, int, int>(3,2,6),
+                    new Tuple<int, int, int>(3,6,7),
+                    new Tuple<int, int, int>(3,7,0),
+                    new Tuple<int, int, int>(0,7,4),
+                    new Tuple<int, int, int>(0,4,1),
+                    new Tuple<int, int, int>(1,4,5),
+                    new Tuple<int, int, int>(1,5,2),
+                    new Tuple<int, int, int>(2,5,6),
+                    new Tuple<int, int, int>(6,5,4),
+                    new Tuple<int, int, int>(6,4,7)
                 };
             _vertexData = new VertexPositionNormalTexture[36]
                 {

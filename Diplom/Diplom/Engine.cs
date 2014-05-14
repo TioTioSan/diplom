@@ -52,14 +52,13 @@ namespace Diplom
         public static Ray CurrentMouseRay { get; set; }
         public static Ray PreviousMouseRay { get; set; }
 
-        public static VertexPositionColor[] VerticesOfControlVertex = new VertexPositionColor[36];
-
         public static ContentLoader ContentLoader { get; set; }
 
         public static List<SceneEntity> SceneEntities = new List<SceneEntity>();
         public static List<SceneEntity> EntitySelectionPool = new List<SceneEntity>();
         public static List<ControlVertex> VertexSelectionPool = new List<ControlVertex>();
         public static List<ControlEdge> EdgeSelectionPool = new List<ControlEdge>();
+        public static List<ControlTriangle> TriangleSelectionPool = new List<ControlTriangle>();
 
 
         public static void Draw(Camera camera)
@@ -119,6 +118,24 @@ namespace Diplom
                     {
                         ActiveControlAxis.IsEnabled = true;
                         ActiveControlAxis.Position = Utils.GetCenter(EdgeSelectionPool);
+                        ActiveControlAxis.SetDirections(Vector3.Up, Vector3.Forward);
+                    }
+                    else
+                    {
+                        ActiveControlAxis.IsEnabled = false;
+                    }
+                    break;
+                case SubObjectMode.Triangle:
+                    if (TriangleSelectionPool.Count == 1)
+                    {
+                        ActiveControlAxis.IsEnabled = true;
+                        ActiveControlAxis.Position = TriangleSelectionPool[0].Center;
+                        ActiveControlAxis.SetDirections(Vector3.Up, Vector3.Forward);
+                    }
+                    else if (TriangleSelectionPool.Count > 1)
+                    {
+                        ActiveControlAxis.IsEnabled = true;
+                        ActiveControlAxis.Position = Utils.GetCenter(TriangleSelectionPool);
                         ActiveControlAxis.SetDirections(Vector3.Up, Vector3.Forward);
                     }
                     else
