@@ -55,7 +55,7 @@ namespace Diplom
             Vector3 right = Vector3.Normalize(Vector3.Cross(Vector3.Normalize(_position - target), _up));
             Quaternion qRotate = Quaternion.CreateFromAxisAngle(right, deltaY * rotationSpeed) * 
                                  Quaternion.CreateFromAxisAngle(_up, -deltaX * rotationSpeed);
-            _position = Vector3.Transform(_position - target, qRotate);
+            _position = Vector3.Transform(_position - target, qRotate) + target;
 
             Vector3 newRight = Vector3.Normalize(Vector3.Cross(Vector3.Normalize(_position - target), _up));
             if (Vector3.Dot(right, newRight) <= -0.94f) _up *= -1;

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
-using Diplom.Intefaces;
 using Diplom.Primitives;
 
 namespace Diplom.SceneHelpers
@@ -39,6 +38,20 @@ namespace Diplom.SceneHelpers
         public void Translate(Vector3 delta)
         {
             Position += delta;
+        }
+        public void TranslateToPoint(Vector3 point)
+        {
+            Position = point;
+        }
+        public void Rotate(Quaternion qRotate, Vector3 center)
+        {
+            if (center == Position) return;
+            Position = Vector3.Transform(Position - center, qRotate) + center;
+        }
+        public void Scale(Vector3 scale, Vector3 center)
+        {
+            if (center == Position) return;
+            Position += (Position - center) * scale;
         }
 
         public void Draw()

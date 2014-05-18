@@ -76,7 +76,9 @@
     <Compile Include="Camera.cs" />
     <Compile Include="ContentBuilder.cs" />
     <Compile Include="ContentLoader.cs" />
+    <Compile Include="SceneEntityData.cs" />
     <Compile Include="Extentions.cs" />
+    <Compile Include="SceneState.cs" />
     <Compile Include="SceneHelpers\ControlAxis.cs" />
     <Compile Include="SceneHelpers\ControlVertex.cs" />
     <Compile Include="Engine.cs" />
@@ -86,8 +88,6 @@
     <Compile Include="SceneHelpers\ControlEdge.cs" />
     <Compile Include="SceneHelpers\HelpersGeometry.cs" />
     <Compile Include="SceneHelpers\GridComponent.cs" />
-    <Compile Include="Intefaces\IDrawable.cs" />
-    <Compile Include="Intefaces\ITransformable.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -123,16 +123,12 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <None Include="Content\cat.tga" />
-    <None Include="Content\Cats.fbx" />
-    <None Include="Content\Cylinder.fbx" />
+    <None Include="Content\DiplomFont.spritefont">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Content\DottedLine.tga">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Content\SceneEntityEffect.fx" />
-    <None Include="Content\SpaceShip.fbx" />
-    <None Include="Content\Sphere.fbx" />
-    <None Include="Content\wedge_p2_diff_v1.tga" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

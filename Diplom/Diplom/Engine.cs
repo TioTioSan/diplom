@@ -6,7 +6,6 @@ using System.Reflection;
 using System.IO;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
-using Diplom.Intefaces;
 using Microsoft.Xna.Framework;
 using Diplom.SceneHelpers;
 
@@ -14,15 +13,26 @@ namespace Diplom
 {
     public static class Engine
     {
-        // Custom rasterizer state for drawing in wireframe.
-        public static RasterizerState WireFrame = new RasterizerState
-        {
-            FillMode = FillMode.WireFrame
-        };
+        public static SceneState StartSceneState;
+        private static List<SceneState> UndoStack = new List<SceneState>();
+        private static List<SceneState> RedoStack = new List<SceneState>();
+
+        public static int UndoCount = 50;
 
         public static GraphicsDevice ActiveGraphicsDevice { get; set; }
         public static Camera ActiveCamera { get; set; }
         public static SpriteBatch SpriteBatch { get; set; }
+
+        public static ContentLoader ContentLoader { get; set; }
+
+        public static MainForm MainForm { get; set; }
+
+        public static Vector2 CurrentMousePos { get; set; }
+        public static Vector2 PreviousMousePos { get; set; }
+
+        public static Ray CurrentMouseRay { get; set; }
+        public static Ray PreviousMouseRay { get; set; }
+
         public static ControlAxis ActiveControlAxis { get; set; }
 
         private static TransformationMode _activeTransformMode;
@@ -34,8 +44,15 @@ namespace Diplom
                 if (_activeTransformMode != value)
                     _activeTransformMode = value;
                 ActiveControlAxis.ActiveMode = value;
+
+                if (value != TransformationMode.Translate)
+                    Engine.MainForm.ResetNumericUpDowns();
+                else if (ActiveControlAxis.Position.X != float.MaxValue)
+                    Engine.MainForm.SetNumericUpDowns(ActiveControlAxis.Position);
             }
         }
+
+        public static bool IsRestore = false;
 
         private static SubObjectMode _activeSubObjectMode = SubObjectMode.None;
         public static SubObjectMode ActiveSubObjectMode
@@ -44,17 +61,22 @@ namespace Diplom
             set
             {
                 if (_activeSubObjectMode == value) return;
+
+                if (!IsRestore)
+                    StartAction();
+
                 _activeSubObjectMode = value;
                 ActiveControlAxis.SubObjectModeChanged();
+
+                if (!IsRestore)
+                    EndAction();
             }
         }
 
-        public static Ray CurrentMouseRay { get; set; }
-        public static Ray PreviousMouseRay { get; set; }
-
-        public static ContentLoader ContentLoader { get; set; }
+        public static DrawMode ActiveDrawMode { get; set; }
 
         public static List<SceneEntity> SceneEntities = new List<SceneEntity>();
+
         public static List<SceneEntity> EntitySelectionPool = new List<SceneEntity>();
         public static List<ControlVertex> VertexSelectionPool = new List<ControlVertex>();
         public static List<ControlEdge> EdgeSelectionPool = new List<ControlEdge>();
@@ -74,19 +96,27 @@ namespace Diplom
                 case SubObjectMode.None:
                     if (EntitySelectionPool.Count == 1)
                     {
+                        Engine.MainForm.IsEnabledSubObjCmbBox = true;
                         ActiveControlAxis.IsEnabled = true;
                         ActiveControlAxis.Position = EntitySelectionPool[0].Center;
-                        ActiveControlAxis.SetDirections(EntitySelectionPool[0].Up, EntitySelectionPool[0].Forward);
+
+                        CleanSelectionPools(new List<SceneEntity>() { EntitySelectionPool[0] });
                     }
                     else if (EntitySelectionPool.Count > 1)
                     {
+                        Engine.MainForm.IsEnabledSubObjCmbBox = true;
                         ActiveControlAxis.IsEnabled = true;
                         ActiveControlAxis.Position = Utils.GetCenter(EntitySelectionPool);
-                        ActiveControlAxis.SetDirections(Vector3.Up, Vector3.Forward);
+                        CleanSelectionPools(EntitySelectionPool);
                     }
                     else
                     {
                         ActiveControlAxis.IsEnabled = false;
+                        Engine.MainForm.IsEnabledSubObjCmbBox = false;
+
+                        VertexSelectionPool.Clear();
+                        EdgeSelectionPool.Clear();
+                        TriangleSelectionPool.Clear();
                     }
                     break;
                 case SubObjectMode.Vertex:
@@ -94,13 +124,11 @@ namespace Diplom
                     {
                         ActiveControlAxis.IsEnabled = true;
                         ActiveControlAxis.Position = VertexSelectionPool[0].Position;
-                        ActiveControlAxis.SetDirections(Vector3.Up, Vector3.Forward);
                     }
                     else if (VertexSelectionPool.Count > 1)
                     {
                         ActiveControlAxis.IsEnabled = true;
                         ActiveControlAxis.Position = Utils.GetCenter(VertexSelectionPool);
-                        ActiveControlAxis.SetDirections(Vector3.Up, Vector3.Forward);
                     }
                     else
                     {
@@ -112,13 +140,11 @@ namespace Diplom
                     {
                         ActiveControlAxis.IsEnabled = true;
                         ActiveControlAxis.Position = EdgeSelectionPool[0].Center;
-                        ActiveControlAxis.SetDirections(Vector3.Up, Vector3.Forward);
                     }
                     else if (EdgeSelectionPool.Count > 1)
                     {
                         ActiveControlAxis.IsEnabled = true;
                         ActiveControlAxis.Position = Utils.GetCenter(EdgeSelectionPool);
-                        ActiveControlAxis.SetDirections(Vector3.Up, Vector3.Forward);
                     }
                     else
                     {
@@ -130,13 +156,11 @@ namespace Diplom
                     {
                         ActiveControlAxis.IsEnabled = true;
                         ActiveControlAxis.Position = TriangleSelectionPool[0].Center;
-                        ActiveControlAxis.SetDirections(Vector3.Up, Vector3.Forward);
                     }
                     else if (TriangleSelectionPool.Count > 1)
                     {
                         ActiveControlAxis.IsEnabled = true;
                         ActiveControlAxis.Position = Utils.GetCenter(TriangleSelectionPool);
-                        ActiveControlAxis.SetDirections(Vector3.Up, Vector3.Forward);
                     }
                     else
                     {
@@ -144,6 +168,66 @@ namespace Diplom
                     }
                     break;
             }
+        }
+
+        public static void StartAction()
+        {
+            StartSceneState = new SceneState();
+        }
+        public static void EndAction()
+        {
+            if (!StartSceneState.IsChanged())
+            {
+                StartSceneState = null;
+                return;
+            }
+
+            if (RedoStack.Count != 0)
+                RedoStack.Clear();
+
+            UndoStack.Add(StartSceneState);
+
+            if (UndoStack.Count > UndoCount)
+                UndoStack.RemoveAt(0);
+
+            StartSceneState = null;
+        }
+        public static void UndoAction()
+        {
+            if (UndoStack.Count != 0)
+            {
+                RedoStack.Add(new SceneState());
+                UndoStack.Last().Restore();
+                UndoStack.Remove(UndoStack.Last());
+            }
+        }
+        public static void RedoAction()
+        {
+            if (RedoStack.Count != 0)
+            {
+                UndoStack.Add(new SceneState());
+                RedoStack.Last().Restore();
+                RedoStack.Remove(RedoStack.Last());
+            }
+        }
+
+        private static void CleanSelectionPools(List<SceneEntity> entities)
+        {
+            VertexSelectionPool.ForEach(x =>
+            {
+                if (!entities.Any(y => y.ControlVertices.Contains(x)))
+                    VertexSelectionPool.Remove(x);
+            });
+            EdgeSelectionPool.ForEach(x =>
+            {
+                if (!entities.Any(y => y.ControlEdges.Contains(x)))
+                    EdgeSelectionPool.Remove(x);
+            });
+            TriangleSelectionPool.ForEach(x =>
+            {
+                if (!entities.Any(y => y.ControlTriangles.Contains(x)))
+                    TriangleSelectionPool.Remove(x);
+            });
         }
     }
 }

@@ -16,8 +16,8 @@ namespace Diplom.Primitives
             _primitiveType = PrimitiveType.TriangleList;
             _vertexPositions = new Vector3[8]
                 {
-                    new Vector3(-1f,1f,1f),new Vector3(1f,1f,1f),new Vector3(1f,-1f,1f),new Vector3(-1f,-1f,1f),
-                    new Vector3(-1f,1f,-1f),new Vector3(1f,1f,-1f),new Vector3(1f,-1f,-1f),new Vector3(-1f,-1f,-1f)
+                    new Vector3(-1f,1f,1f),new Vector3(1f,1f,1f),new Vector3(1f,1f,-1f),new Vector3(-1f,1f,-1f),
+                    new Vector3(-1f,-1f,1f),new Vector3(1f,-1f,1f),new Vector3(1f,-1f,-1f),new Vector3(-1f,-1f,-1f)
                 };
             _normals = new Vector3[6]
                 {

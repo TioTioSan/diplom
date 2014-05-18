@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
-using Diplom.Intefaces;
 using Diplom.Primitives;
 
 namespace Diplom.SceneHelpers
@@ -15,10 +14,11 @@ namespace Diplom.SceneHelpers
         private Matrix _vertexWorld = Matrix.Identity;
         private Color _usualColor = Color.Blue;
         private Color _highlightColor = Color.Red;
+        private Color _wireModeColor = new Color(10, 10, 10);
 
         private VertexPositionColor[] _vertexData;
 
-        public Vector3 FirstVertex 
+        public Vector3 FirstVertex
         {
             get { return _vertexData[0].Position; }
             set { _vertexData[0].Position = value; }
@@ -58,14 +58,33 @@ namespace Diplom.SceneHelpers
             FirstVertex += delta;
             SecondVertex += delta;
         }
+        public void TranslateToPoint(Vector3 point)
+        {
+            FirstVertex = point;
+            SecondVertex = point;
+        }
+        public void Rotate(Quaternion qRotate, Vector3 center)
+        {
+            FirstVertex = Vector3.Transform(FirstVertex - center, qRotate) + center;
+            SecondVertex = Vector3.Transform(SecondVertex - center, qRotate) + center;
+        }
+        public void Scale(Vector3 scale, Vector3 center)
+        {
+            FirstVertex += (FirstVertex - center) * scale;
+            SecondVertex += (SecondVertex - center) * scale;
+        }
 
         public void Draw()
         {
+            Vector3 drawCol = IsSelected ? _highlightColor.ToVector3() : _usualColor.ToVector3();
+            if (Engine.ActiveSubObjectMode != SubObjectMode.Edge)
+                drawCol = _wireModeColor.ToVector3();
+
             _effect.World = Matrix.Identity;
             _effect.View = Engine.ActiveCamera.ViewMatrix;
             _effect.Projection = Engine.ActiveCamera.ProjectionMatrix;
 
-            _effect.DiffuseColor = IsSelected ? _highlightColor.ToVector3() : _usualColor.ToVector3();
+            _effect.DiffuseColor = drawCol;
             _effect.EmissiveColor = _effect.DiffuseColor;
 
             _effect.CurrentTechnique.Passes[0].Apply();

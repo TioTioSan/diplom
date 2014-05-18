@@ -26,9 +26,20 @@ namespace Diplom
 
         protected override void Initialize()
         {
+            Engine.ContentLoader = new ContentLoader(Services);
+            Engine.ActiveGraphicsDevice = GraphicsDevice;
+
+            // Hook the idle event to constantly redraw our animation.
+            Application.Idle += delegate { Invalidate(); };
+        }
+
+        public void Load()
+        {
+            _dottedLine = Engine.ContentLoader.GetLoadedTexture("DottedLine");
+
             _camera = new Camera(GraphicsDevice.Viewport.AspectRatio, new Vector3(50f, 50f, 50f), Vector3.Zero);
-            _snapGrid = new SnapGrid(GraphicsDevice, 8);
-            _controlAxis = new ControlAxis(GraphicsDevice, Engine.ActiveCamera);
+            _snapGrid = new SnapGrid(GraphicsDevice, 10);
+            _controlAxis = new ControlAxis();
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             const float scale = 0.13f;
@@ -40,17 +51,7 @@ namespace Diplom
 
             Engine.ActiveControlAxis = _controlAxis;
             Engine.ActiveCamera = _camera;
-            Engine.ActiveGraphicsDevice = GraphicsDevice;
             Engine.SpriteBatch = _spriteBatch;
-            Engine.ContentLoader = new ContentLoader(Services);
-
-            // Hook the idle event to constantly redraw our animation.
-            Application.Idle += delegate { Invalidate(); };
-        }
-
-        public void Load()
-        {
-            _dottedLine = Engine.ContentLoader.GetLoadedTexture("DottedLine");
         }
 
         protected override void Draw()
@@ -67,6 +68,13 @@ namespace Diplom
 
             if (_selectionRect.X != -1)
                 DrawSelectionRect();
+        }
+
+        public void AddNewSceneEntity()
+        {
+            Engine.StartAction();
+            Engine.SceneEntities.Add(new SceneEntity(new Cube()));
+            Engine.EndAction();
         }
 
         public void MyLeftMouseDown(int x, int y)
@@ -87,6 +95,7 @@ namespace Diplom
 
             if (_selectionRect.X != -1 && !Engine.ActiveControlAxis.IsTransforming && deltaX != 0 && deltaY != 0)
             {
+                Engine.StartAction();
                 switch (Engine.ActiveSubObjectMode)
                 {
                     case SubObjectMode.None:
@@ -101,9 +110,8 @@ namespace Diplom
                     case SubObjectMode.Triangle:
                         Selector.SelectControlTriangleByRectangle(_selectionRect);
                         break;
-                    default:
-                        break;
                 }
+                Engine.EndAction();
             }
 
             _selectionRect.X = -1;
@@ -142,8 +150,10 @@ namespace Diplom
                                 Transformer.Translate();
                                 break;
                             case TransformationMode.Rotate:
+                                Transformer.Rotate();
                                 break;
                             case TransformationMode.Scale:
+                                Transformer.Scale();
                                 break;
                         }
                     }
@@ -163,8 +173,67 @@ namespace Diplom
             Engine.ActiveCamera.MoveToTarget(delta);
         }
 
+        public void MyKeyDown(KeyEventArgs e)
+        {
+            if (e.Modifiers == Keys.Control && e.KeyCode == Keys.Z)
+            {
+                Engine.UndoAction();
+            }
+
+            if (e.Modifiers == Keys.Control && e.KeyCode == Keys.Y)
+            {
+                Engine.RedoAction();
+            }
+
+            #region Deleting
+            if (e.KeyCode == Keys.Delete)
+            {
+                if (Engine.EntitySelectionPool.Count == 0)
+                    return;
+                switch (Engine.ActiveSubObjectMode)
+                {
+                    case SubObjectMode.None:
+                        foreach (var item in Engine.EntitySelectionPool)
+                            Engine.SceneEntities.Remove(item);
+                        Engine.EntitySelectionPool.Clear();
+                        Engine.SelectionChanged();
+                        break;
+                    case SubObjectMode.Vertex:
+                        if (Engine.VertexSelectionPool.Count != 0) 
+                        {
+                            foreach (var item in Engine.EntitySelectionPool)
+                                item.DeleteVertex();
+                            Engine.VertexSelectionPool.Clear();
+                            Engine.SelectionChanged();
+                        }
+                        break;
+                    case SubObjectMode.Edge:
+                        if (Engine.EdgeSelectionPool.Count != 0)
+                        {
+                            foreach (var item in Engine.EntitySelectionPool)
+                                item.DeleteEdge();
+                            Engine.EdgeSelectionPool.Clear();
+                            Engine.SelectionChanged();
+                        }
+                        break;
+                    case SubObjectMode.Triangle:
+                        if (Engine.TriangleSelectionPool.Count != 0)
+                        {
+                            foreach (var item in Engine.EntitySelectionPool)
+                                item.DeleteTriangle();
+                            Engine.TriangleSelectionPool.Clear();
+                            Engine.SelectionChanged();
+                        }
+                        break;
+                }
+            }
+            #endregion
+        }
+
+
         private void MyMouseClick(int x, int y)
         {
+            Engine.StartAction();
             switch (Engine.ActiveSubObjectMode)
             {
                 case SubObjectMode.None:
@@ -179,9 +248,8 @@ namespace Diplom
                 case SubObjectMode.Triangle:
                     Selector.PickControlTriangle();
                     break;
-                default:
-                    break;
             }
+            Engine.EndAction();
         }
 
         private void DrawSelectionRect()

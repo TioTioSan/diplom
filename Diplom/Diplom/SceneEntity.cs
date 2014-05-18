@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Diplom.Intefaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Diplom.Primitives;
@@ -15,11 +14,10 @@ namespace Diplom
         #region Fields & Properties
         const float LENGTH = 5f;
 
-        private Model _model;
-        private Matrix _world;
-        private Effect _effect;
+        private int _id;
+        public int Id { get { return _id; } }
+
         private BasicEffect _basicEffect;
-        private DynamicVertexBuffer _dynamicVB;
         private GraphicsDevice _graphicsDevice;
 
         private BasicEffect _selectionBoxEffect;
@@ -34,35 +32,6 @@ namespace Diplom
             set { _position = value; }
         }
 
-        private Vector3 _scale = Vector3.One;
-        public Vector3 Scale
-        {
-            get { return _scale; }
-            set { _scale = value; }
-        }
-
-        private Vector3 _forward = Vector3.Forward;
-        public Vector3 Forward
-        {
-            get { return _forward; }
-            set
-            {
-                _forward = value;
-                _forward.Normalize();
-            }
-        }
-
-        private Vector3 _up = Vector3.Up;
-        public Vector3 Up
-        {
-            get { return _up; }
-            set
-            {
-                _up = value;
-                _up.Normalize();
-            }
-        }
-
         private BoundingBox _boundingBox;
         public BoundingBox BoundingBox
         {
@@ -74,10 +43,13 @@ namespace Diplom
         public Vector3 Center { get { return _center; } }
 
         private Vector3[] _vertexPositions;
-
+        public Vector3[] VertexPositions { get { return _vertexPositions; } }
         private VertexPositionNormalTexture[] _vertexData;
+        public VertexPositionNormalTexture[] VertexData { get { return _vertexData; } }
         private PrimitiveType _primitiveType;
+        public PrimitiveType PrimitiveType { get { return _primitiveType; } }
         private int _primitiveCount;
+        public int PrimitiveCount { get { return _primitiveCount; } }
 
         private List<ControlVertex> _controlVertices;
         public List<ControlVertex> ControlVertices { get { return _controlVertices; } }
@@ -89,35 +61,16 @@ namespace Diplom
         public List<ControlTriangle> ControlTriangles { get { return _controlTriangles; } }
         #endregion
 
-        public SceneEntity(Model model, Effect effect, GraphicsDevice graphicsDevice)
+        public SceneEntity(PrimitiveBase primitive)
         {
-            _model = model;
-            _effect = effect;
-            _graphicsDevice = graphicsDevice;
+            _id = Engine.SceneEntities.Count;
 
-            //Vector3[] vert = new Vector3[_model.Meshes[0].MeshParts[0].VertexBuffer.VertexCount/3];
-            //_model.Meshes[0].MeshParts[0].VertexBuffer.GetData<Vector3>(vert);
-
-            //_dynamicVB = new DynamicVertexBuffer(_graphicsDevice, typeof(Vector3), vert.Length, BufferUsage.WriteOnly);
-            //_dynamicVB.SetData<Vector3>(vert);
-        }
-        //public SceneEntity(Primitive primitive, Effect effect, GraphicsDevice graphicsDevice)
-        //{
-        //    _effect = effect;
-        //    _graphicsDevice = graphicsDevice;
-        //    _vertexData = primitive.VertexData;
-        //    _vertexPositions = primitive.VertexPositions;
-        //    _primitiveType = primitive.PrimitiveType;
-        //    _primitiveCount = primitive.PrimitiveCount;
-        //}
-        public SceneEntity(PrimitiveBase primitive, GraphicsDevice graphicsDevice)
-        {
-            _basicEffect = new BasicEffect(graphicsDevice);
+            _basicEffect = new BasicEffect(Engine.ActiveGraphicsDevice);
             _basicEffect.EnableDefaultLighting();
 
-            _selectionBoxEffect = new BasicEffect(graphicsDevice) { VertexColorEnabled = true };
+            _selectionBoxEffect = new BasicEffect(Engine.ActiveGraphicsDevice) { VertexColorEnabled = true };
+            _graphicsDevice = Engine.ActiveGraphicsDevice;
 
-            _graphicsDevice = graphicsDevice;
             _vertexData = primitive.VertexData;
             _vertexPositions = primitive.VertexPositions;
             _primitiveType = primitive.PrimitiveType;
@@ -145,11 +98,6 @@ namespace Diplom
             RecalcBoundingBox();
         }
 
-        public void Update()
-        {
-            _world = Matrix.CreateScale(_scale) * Matrix.CreateWorld(_position, _forward, _up);
-        }
-
         public float? Select(Ray selectionRay)
         {
             return selectionRay.Intersects(_boundingBox);
@@ -160,22 +108,16 @@ namespace Diplom
             _graphicsDevice.DepthStencilState = DepthStencilState.Default;
             _graphicsDevice.RasterizerState = RasterizerState.CullNone;
 
-            if (_effect == null)
-            {
-                _basicEffect.World = camera.WorldMatrix;
-                _basicEffect.View = camera.ViewMatrix;
-                _basicEffect.Projection = camera.ProjectionMatrix;
+            _basicEffect.World = camera.WorldMatrix;
+            _basicEffect.View = camera.ViewMatrix;
+            _basicEffect.Projection = camera.ProjectionMatrix;
 
-                _basicEffect.DiffuseColor = Color.White.ToVector3();
+            _basicEffect.DiffuseColor = Color.White.ToVector3();
 
-                _basicEffect.CurrentTechnique.Passes[0].Apply();
-            }
-            else
-            {
+            _basicEffect.CurrentTechnique.Passes[0].Apply();
 
-            }
-
-            _graphicsDevice.DrawUserPrimitives(_primitiveType, _vertexData, 0, _primitiveCount);
+            if (_primitiveCount > 0)
+                _graphicsDevice.DrawUserPrimitives(_primitiveType, _vertexData, 0, _primitiveCount);
 
             if (Engine.EntitySelectionPool.Contains(this))
             {
@@ -193,8 +135,13 @@ namespace Diplom
                 }
                 DrawSelectionBox();
             }
+
+            if (Engine.ActiveDrawMode == DrawMode.WithEdges &&
+                Engine.ActiveSubObjectMode != SubObjectMode.Edge)
+                DrawControlEdges();
         }
 
+        #region Translate
         public void Translate(Vector3 delta)
         {
             _position += delta;
@@ -267,7 +214,7 @@ namespace Diplom
                             _controlTriangles[i].ThirdVertex += delta;
                     }
 
-                    contrVertex.Position += delta;
+                    contrVertex.Translate(delta);
                 }
             }
 
@@ -295,7 +242,7 @@ namespace Diplom
                     for (int i = 0; i < _controlVertices.Count; i++)
                     {
                         if (_controlVertices[i].Position == contrEdge.FirstVertex || _controlVertices[i].Position == contrEdge.SecondVertex)
-                            _controlVertices[i].Position += delta;
+                            _controlVertices[i].Translate(delta);
                     }
                     for (int i = 0; i < _controlTriangles.Count; i++)
                     {
@@ -317,8 +264,7 @@ namespace Diplom
                             _controlEdges[i].SecondVertex += delta;
                     }
 
-                    contrEdge.FirstVertex += delta;
-                    contrEdge.SecondVertex += delta;
+                    contrEdge.Translate(delta);
                 }
             }
 
@@ -334,29 +280,29 @@ namespace Diplom
                 {
                     for (int i = 0; i < _vertexPositions.Length; i++)
                     {
-                        if (_vertexPositions[i] == contrTrn.FirstVertex || 
-                            _vertexPositions[i] == contrTrn.SecondVertex || 
+                        if (_vertexPositions[i] == contrTrn.FirstVertex ||
+                            _vertexPositions[i] == contrTrn.SecondVertex ||
                             _vertexPositions[i] == contrTrn.ThirdVertex)
                             _vertexPositions[i] += delta;
                     }
                     for (int i = 0; i < _vertexData.Length; i++)
                     {
-                        if (_vertexData[i].Position == contrTrn.FirstVertex || 
-                            _vertexData[i].Position == contrTrn.SecondVertex || 
+                        if (_vertexData[i].Position == contrTrn.FirstVertex ||
+                            _vertexData[i].Position == contrTrn.SecondVertex ||
                             _vertexData[i].Position == contrTrn.ThirdVertex)
                             _vertexData[i].Position += delta;
                     }
 
                     for (int i = 0; i < _controlVertices.Count; i++)
                     {
-                        if (_controlVertices[i].Position == contrTrn.FirstVertex || 
-                            _controlVertices[i].Position == contrTrn.SecondVertex || 
+                        if (_controlVertices[i].Position == contrTrn.FirstVertex ||
+                            _controlVertices[i].Position == contrTrn.SecondVertex ||
                             _controlVertices[i].Position == contrTrn.ThirdVertex)
-                            _controlVertices[i].Position += delta;
+                            _controlVertices[i].Translate(delta);
                     }
                     for (int i = 0; i < _controlEdges.Count; i++)
                     {
-                        if (_controlEdges[i].FirstVertex == contrTrn.FirstVertex || 
+                        if (_controlEdges[i].FirstVertex == contrTrn.FirstVertex ||
                             _controlEdges[i].FirstVertex == contrTrn.SecondVertex ||
                             _controlEdges[i].FirstVertex == contrTrn.ThirdVertex)
                             _controlEdges[i].FirstVertex += delta;
@@ -370,23 +316,100 @@ namespace Diplom
                         if (_controlTriangles[i].IsSelected)
                             continue;
 
-                        if (_controlTriangles[i].FirstVertex == contrTrn.FirstVertex || 
+                        if (_controlTriangles[i].FirstVertex == contrTrn.FirstVertex ||
                             _controlTriangles[i].FirstVertex == contrTrn.SecondVertex ||
                             _controlTriangles[i].FirstVertex == contrTrn.ThirdVertex)
                             _controlTriangles[i].FirstVertex += delta;
-                        if (_controlTriangles[i].SecondVertex == contrTrn.FirstVertex || 
+                        if (_controlTriangles[i].SecondVertex == contrTrn.FirstVertex ||
                             _controlTriangles[i].SecondVertex == contrTrn.SecondVertex ||
                             _controlTriangles[i].SecondVertex == contrTrn.ThirdVertex)
                             _controlTriangles[i].SecondVertex += delta;
-                        if (_controlTriangles[i].ThirdVertex == contrTrn.FirstVertex || 
+                        if (_controlTriangles[i].ThirdVertex == contrTrn.FirstVertex ||
                             _controlTriangles[i].ThirdVertex == contrTrn.SecondVertex ||
                             _controlTriangles[i].ThirdVertex == contrTrn.ThirdVertex)
                             _controlTriangles[i].ThirdVertex += delta;
-                    }                    
+                    }
 
-                    contrTrn.FirstVertex += delta;
-                    contrTrn.SecondVertex += delta;
-                    contrTrn.ThirdVertex += delta;
+                    contrTrn.Translate(delta);
+                }
+            }
+
+            RecalcBoundingBox();
+            RecalcNormals();
+        }
+        #endregion
+
+        #region Rotate
+        public void Rotate(Quaternion qRotate)
+        {
+            for (int i = 0; i < _controlTriangles.Count; i++)
+            {
+                _controlTriangles[i].Rotate(qRotate, _center);
+            }
+            for (int i = 0; i < _controlEdges.Count; i++)
+            {
+                _controlEdges[i].Rotate(qRotate, _center);
+            }
+            for (int i = 0; i < _controlVertices.Count; i++)
+            {
+                _controlVertices[i].Rotate(qRotate, _center);
+            }
+            for (int i = 0; i < _vertexPositions.Length; i++)
+            {
+                _vertexPositions[i] = Vector3.Transform(_vertexPositions[i] - _center, qRotate) + _center;
+            }
+            for (int i = 0; i < _vertexData.Length; i++)
+            {
+                _vertexData[i].Position = Vector3.Transform(_vertexData[i].Position - _center, qRotate) + _center;
+            }
+
+            RecalcBoundingBox();
+            RecalcNormals();
+        }
+
+        public void RotateControlVertices(Quaternion qRotate)
+        {
+            foreach (var contrVertex in _controlVertices)
+            {
+                if (contrVertex.IsSelected)
+                {
+                    for (int i = 0; i < _vertexPositions.Length; i++)
+                    {
+                        if (_vertexPositions[i] == contrVertex.Position)
+                            _vertexPositions[i] = Vector3.Transform(_vertexPositions[i] - Engine.ActiveControlAxis.Position, qRotate) + Engine.ActiveControlAxis.Position;
+                    }
+                    for (int i = 0; i < _vertexData.Length; i++)
+                    {
+                        if (_vertexData[i].Position == contrVertex.Position)
+                            _vertexData[i].Position = Vector3.Transform(_vertexData[i].Position - Engine.ActiveControlAxis.Position, qRotate) + Engine.ActiveControlAxis.Position;
+                    }
+                    for (int i = 0; i < _controlEdges.Count; i++)
+                    {
+                        if (_controlEdges[i].FirstVertex == contrVertex.Position)
+                        {
+                            _controlEdges[i].FirstVertex = Vector3.Transform(_controlEdges[i].FirstVertex - Engine.ActiveControlAxis.Position, qRotate) + Engine.ActiveControlAxis.Position;
+                            continue;
+                        }
+                        if (_controlEdges[i].SecondVertex == contrVertex.Position)
+                            _controlEdges[i].SecondVertex = Vector3.Transform(_controlEdges[i].SecondVertex - Engine.ActiveControlAxis.Position, qRotate) + Engine.ActiveControlAxis.Position;
+                    }
+                    for (int i = 0; i < _controlTriangles.Count; i++)
+                    {
+                        if (_controlTriangles[i].FirstVertex == contrVertex.Position)
+                        {
+                            _controlTriangles[i].FirstVertex = Vector3.Transform(_controlTriangles[i].FirstVertex - Engine.ActiveControlAxis.Position, qRotate) + Engine.ActiveControlAxis.Position;
+                            continue;
+                        }
+                        if (_controlTriangles[i].SecondVertex == contrVertex.Position)
+                        {
+                            _controlTriangles[i].SecondVertex = Vector3.Transform(_controlTriangles[i].SecondVertex - Engine.ActiveControlAxis.Position, qRotate) + Engine.ActiveControlAxis.Position;
+                            continue;
+                        }
+                        if (_controlTriangles[i].ThirdVertex == contrVertex.Position)
+                            _controlTriangles[i].ThirdVertex = Vector3.Transform(_controlTriangles[i].ThirdVertex - Engine.ActiveControlAxis.Position, qRotate) + Engine.ActiveControlAxis.Position;
+                    }
+
+                    contrVertex.Rotate(qRotate, Engine.ActiveControlAxis.Position);
                 }
             }
 
@@ -394,6 +417,414 @@ namespace Diplom
             RecalcNormals();
         }
 
+        public void RotateControlEdges(Quaternion qRotate)
+        {
+            foreach (var contrEdge in _controlEdges)
+            {
+                if (contrEdge.IsSelected)
+                {
+                    for (int i = 0; i < _vertexPositions.Length; i++)
+                    {
+                        if (_vertexPositions[i] == contrEdge.FirstVertex || _vertexPositions[i] == contrEdge.SecondVertex)
+                            _vertexPositions[i] = Vector3.Transform(_vertexPositions[i] - Engine.ActiveControlAxis.Position, qRotate) + Engine.ActiveControlAxis.Position;
+                    }
+                    for (int i = 0; i < _vertexData.Length; i++)
+                    {
+                        if (_vertexData[i].Position == contrEdge.FirstVertex || _vertexData[i].Position == contrEdge.SecondVertex)
+                            _vertexData[i].Position = Vector3.Transform(_vertexData[i].Position - Engine.ActiveControlAxis.Position, qRotate) + Engine.ActiveControlAxis.Position;
+                    }
+
+                    for (int i = 0; i < _controlVertices.Count; i++)
+                    {
+                        if (_controlVertices[i].Position == contrEdge.FirstVertex || _controlVertices[i].Position == contrEdge.SecondVertex)
+                            _controlVertices[i].Position = Vector3.Transform(_controlVertices[i].Position - Engine.ActiveControlAxis.Position, qRotate) + Engine.ActiveControlAxis.Position;
+
+                    }
+                    for (int i = 0; i < _controlTriangles.Count; i++)
+                    {
+                        if (_controlTriangles[i].FirstVertex == contrEdge.FirstVertex || _controlTriangles[i].FirstVertex == contrEdge.SecondVertex)
+                            _controlTriangles[i].FirstVertex = Vector3.Transform(_controlTriangles[i].FirstVertex - Engine.ActiveControlAxis.Position, qRotate) + Engine.ActiveControlAxis.Position;
+                        if (_controlTriangles[i].SecondVertex == contrEdge.FirstVertex || _controlTriangles[i].SecondVertex == contrEdge.SecondVertex)
+                            _controlTriangles[i].SecondVertex = Vector3.Transform(_controlTriangles[i].SecondVertex - Engine.ActiveControlAxis.Position, qRotate) + Engine.ActiveControlAxis.Position;
+                        if (_controlTriangles[i].ThirdVertex == contrEdge.FirstVertex || _controlTriangles[i].ThirdVertex == contrEdge.SecondVertex)
+                            _controlTriangles[i].ThirdVertex = Vector3.Transform(_controlTriangles[i].ThirdVertex - Engine.ActiveControlAxis.Position, qRotate) + Engine.ActiveControlAxis.Position;
+                    }
+                    for (int i = 0; i < _controlEdges.Count; i++)
+                    {
+                        if (_controlEdges[i].IsSelected)
+                            continue;
+
+                        if (_controlEdges[i].FirstVertex == contrEdge.FirstVertex || _controlEdges[i].FirstVertex == contrEdge.SecondVertex)
+                            _controlEdges[i].FirstVertex = Vector3.Transform(_controlEdges[i].FirstVertex - Engine.ActiveControlAxis.Position, qRotate) + Engine.ActiveControlAxis.Position;
+                        if (_controlEdges[i].SecondVertex == contrEdge.FirstVertex || _controlEdges[i].SecondVertex == contrEdge.SecondVertex)
+                            _controlEdges[i].SecondVertex = Vector3.Transform(_controlEdges[i].SecondVertex - Engine.ActiveControlAxis.Position, qRotate) + Engine.ActiveControlAxis.Position;
+                    }
+
+                    contrEdge.Rotate(qRotate, Engine.ActiveControlAxis.Position);
+                }
+            }
+
+            RecalcBoundingBox();
+            RecalcNormals();
+        }
+
+        public void RotateControlTriangles(Quaternion qRotate)
+        {
+            foreach (var contrTrn in _controlTriangles)
+            {
+                if (contrTrn.IsSelected)
+                {
+                    for (int i = 0; i < _vertexPositions.Length; i++)
+                    {
+                        if (_vertexPositions[i] == contrTrn.FirstVertex ||
+                            _vertexPositions[i] == contrTrn.SecondVertex ||
+                            _vertexPositions[i] == contrTrn.ThirdVertex)
+                            _vertexPositions[i] = Vector3.Transform(_vertexPositions[i] - Engine.ActiveControlAxis.Position, qRotate) + Engine.ActiveControlAxis.Position;
+                    }
+                    for (int i = 0; i < _vertexData.Length; i++)
+                    {
+                        if (_vertexData[i].Position == contrTrn.FirstVertex ||
+                            _vertexData[i].Position == contrTrn.SecondVertex ||
+                            _vertexData[i].Position == contrTrn.ThirdVertex)
+                            _vertexData[i].Position = Vector3.Transform(_vertexData[i].Position - Engine.ActiveControlAxis.Position, qRotate) + Engine.ActiveControlAxis.Position;
+                    }
+
+                    for (int i = 0; i < _controlVertices.Count; i++)
+                    {
+                        if (_controlVertices[i].Position == contrTrn.FirstVertex ||
+                            _controlVertices[i].Position == contrTrn.SecondVertex ||
+                            _controlVertices[i].Position == contrTrn.ThirdVertex)
+                            _controlVertices[i].Rotate(qRotate, Engine.ActiveControlAxis.Position);
+                    }
+                    for (int i = 0; i < _controlEdges.Count; i++)
+                    {
+                        if (_controlEdges[i].FirstVertex == contrTrn.FirstVertex ||
+                            _controlEdges[i].FirstVertex == contrTrn.SecondVertex ||
+                            _controlEdges[i].FirstVertex == contrTrn.ThirdVertex)
+                            _controlEdges[i].FirstVertex = Vector3.Transform(_controlEdges[i].FirstVertex - Engine.ActiveControlAxis.Position, qRotate) + Engine.ActiveControlAxis.Position;
+                        if (_controlEdges[i].SecondVertex == contrTrn.FirstVertex ||
+                            _controlEdges[i].SecondVertex == contrTrn.SecondVertex ||
+                            _controlEdges[i].SecondVertex == contrTrn.ThirdVertex)
+                            _controlEdges[i].SecondVertex = Vector3.Transform(_controlEdges[i].SecondVertex - Engine.ActiveControlAxis.Position, qRotate) + Engine.ActiveControlAxis.Position;
+                    }
+                    for (int i = 0; i < _controlTriangles.Count; i++)
+                    {
+                        if (_controlTriangles[i].IsSelected)
+                            continue;
+
+                        if (_controlTriangles[i].FirstVertex == contrTrn.FirstVertex ||
+                            _controlTriangles[i].FirstVertex == contrTrn.SecondVertex ||
+                            _controlTriangles[i].FirstVertex == contrTrn.ThirdVertex)
+                            _controlTriangles[i].FirstVertex = Vector3.Transform(_controlTriangles[i].FirstVertex - Engine.ActiveControlAxis.Position, qRotate) + Engine.ActiveControlAxis.Position;
+                        if (_controlTriangles[i].SecondVertex == contrTrn.FirstVertex ||
+                            _controlTriangles[i].SecondVertex == contrTrn.SecondVertex ||
+                            _controlTriangles[i].SecondVertex == contrTrn.ThirdVertex)
+                            _controlTriangles[i].SecondVertex = Vector3.Transform(_controlTriangles[i].SecondVertex - Engine.ActiveControlAxis.Position, qRotate) + Engine.ActiveControlAxis.Position;
+                        if (_controlTriangles[i].ThirdVertex == contrTrn.FirstVertex ||
+                            _controlTriangles[i].ThirdVertex == contrTrn.SecondVertex ||
+                            _controlTriangles[i].ThirdVertex == contrTrn.ThirdVertex)
+                            _controlTriangles[i].ThirdVertex = Vector3.Transform(_controlTriangles[i].ThirdVertex - Engine.ActiveControlAxis.Position, qRotate) + Engine.ActiveControlAxis.Position;
+                    }
+
+                    contrTrn.Rotate(qRotate, Engine.ActiveControlAxis.Position);
+                }
+            }
+
+            RecalcBoundingBox();
+            RecalcNormals();
+        }
+        #endregion
+
+        #region Scale
+        public void Scale(Vector3 scale)
+        {
+            if (scale.Length() == 0) return;
+            for (int i = 0; i < _controlTriangles.Count; i++)
+            {
+                _controlTriangles[i].Scale(scale, _center);
+            }
+            for (int i = 0; i < _controlEdges.Count; i++)
+            {
+                _controlEdges[i].Scale(scale, _center);
+            }
+            for (int i = 0; i < _controlVertices.Count; i++)
+            {
+                _controlVertices[i].Scale(scale, _center);
+            }
+            for (int i = 0; i < _vertexPositions.Length; i++)
+            {
+                _vertexPositions[i] += (_vertexPositions[i] - _center) * scale;
+            }
+            for (int i = 0; i < _vertexData.Length; i++)
+            {
+                _vertexData[i].Position += (_vertexData[i].Position - _center) * scale;
+            }
+
+            RecalcBoundingBox();
+            RecalcNormals();
+        }
+
+        public void ScaleControlVertices(Vector3 scale)
+        {
+            foreach (var contrVertex in _controlVertices)
+            {
+                if (contrVertex.IsSelected)
+                {
+                    for (int i = 0; i < _vertexPositions.Length; i++)
+                    {
+                        if (_vertexPositions[i] == contrVertex.Position)
+                            _vertexPositions[i] += (_vertexPositions[i] - Engine.ActiveControlAxis.Position) * scale;
+                    }
+                    for (int i = 0; i < _vertexData.Length; i++)
+                    {
+                        if (_vertexData[i].Position == contrVertex.Position)
+                            _vertexData[i].Position += (_vertexData[i].Position - Engine.ActiveControlAxis.Position) * scale;
+                    }
+                    for (int i = 0; i < _controlEdges.Count; i++)
+                    {
+                        if (_controlEdges[i].FirstVertex == contrVertex.Position)
+                        {
+                            _controlEdges[i].FirstVertex += (_controlEdges[i].FirstVertex - Engine.ActiveControlAxis.Position) * scale;
+                            continue;
+                        }
+                        if (_controlEdges[i].SecondVertex == contrVertex.Position)
+                            _controlEdges[i].SecondVertex += (_controlEdges[i].SecondVertex - Engine.ActiveControlAxis.Position) * scale;
+                    }
+                    for (int i = 0; i < _controlTriangles.Count; i++)
+                    {
+                        if (_controlTriangles[i].FirstVertex == contrVertex.Position)
+                        {
+                            _controlTriangles[i].FirstVertex += (_controlTriangles[i].FirstVertex - Engine.ActiveControlAxis.Position) * scale;
+                            continue;
+                        }
+                        if (_controlTriangles[i].SecondVertex == contrVertex.Position)
+                        {
+                            _controlTriangles[i].SecondVertex += (_controlTriangles[i].SecondVertex - Engine.ActiveControlAxis.Position) * scale;
+                            continue;
+                        }
+                        if (_controlTriangles[i].ThirdVertex == contrVertex.Position)
+                            _controlTriangles[i].ThirdVertex += (_controlTriangles[i].ThirdVertex - Engine.ActiveControlAxis.Position) * scale;
+                    }
+
+                    contrVertex.Scale(scale, Engine.ActiveControlAxis.Position);
+                }
+            }
+
+            RecalcBoundingBox();
+            RecalcNormals();
+        }
+
+        public void ScaleControlEdges(Vector3 scale)
+        {
+            foreach (var contrEdge in _controlEdges)
+            {
+                if (contrEdge.IsSelected)
+                {
+                    for (int i = 0; i < _vertexPositions.Length; i++)
+                    {
+                        if (_vertexPositions[i] == contrEdge.FirstVertex || _vertexPositions[i] == contrEdge.SecondVertex)
+                            _vertexPositions[i] += (_vertexPositions[i] - Engine.ActiveControlAxis.Position) * scale;
+                    }
+                    for (int i = 0; i < _vertexData.Length; i++)
+                    {
+                        if (_vertexData[i].Position == contrEdge.FirstVertex || _vertexData[i].Position == contrEdge.SecondVertex)
+                            _vertexData[i].Position += (_vertexData[i].Position - Engine.ActiveControlAxis.Position) * scale;
+                    }
+
+                    for (int i = 0; i < _controlVertices.Count; i++)
+                    {
+                        if (_controlVertices[i].Position == contrEdge.FirstVertex || _controlVertices[i].Position == contrEdge.SecondVertex)
+                            _controlVertices[i].Position += (_controlVertices[i].Position - Engine.ActiveControlAxis.Position) * scale;
+
+                    }
+                    for (int i = 0; i < _controlTriangles.Count; i++)
+                    {
+                        if (_controlTriangles[i].FirstVertex == contrEdge.FirstVertex || _controlTriangles[i].FirstVertex == contrEdge.SecondVertex)
+                            _controlTriangles[i].FirstVertex += (_controlTriangles[i].FirstVertex - Engine.ActiveControlAxis.Position) * scale;
+                        if (_controlTriangles[i].SecondVertex == contrEdge.FirstVertex || _controlTriangles[i].SecondVertex == contrEdge.SecondVertex)
+                            _controlTriangles[i].SecondVertex += (_controlTriangles[i].SecondVertex - Engine.ActiveControlAxis.Position) * scale;
+                        if (_controlTriangles[i].ThirdVertex == contrEdge.FirstVertex || _controlTriangles[i].ThirdVertex == contrEdge.SecondVertex)
+                            _controlTriangles[i].ThirdVertex += (_controlTriangles[i].ThirdVertex - Engine.ActiveControlAxis.Position) * scale;
+                    }
+                    for (int i = 0; i < _controlEdges.Count; i++)
+                    {
+                        if (_controlEdges[i].IsSelected)
+                            continue;
+
+                        if (_controlEdges[i].FirstVertex == contrEdge.FirstVertex || _controlEdges[i].FirstVertex == contrEdge.SecondVertex)
+                            _controlEdges[i].FirstVertex += (_controlEdges[i].FirstVertex - Engine.ActiveControlAxis.Position) * scale;
+                        if (_controlEdges[i].SecondVertex == contrEdge.FirstVertex || _controlEdges[i].SecondVertex == contrEdge.SecondVertex)
+                            _controlEdges[i].SecondVertex += (_controlEdges[i].SecondVertex - Engine.ActiveControlAxis.Position) * scale;
+                    }
+
+                    contrEdge.Scale(scale, Engine.ActiveControlAxis.Position);
+                }
+            }
+
+            RecalcBoundingBox();
+            RecalcNormals();
+        }
+
+        public void ScaleControlTriangles(Vector3 scale)
+        {
+            foreach (var contrTrn in _controlTriangles)
+            {
+                if (contrTrn.IsSelected)
+                {
+                    for (int i = 0; i < _vertexPositions.Length; i++)
+                    {
+                        if (_vertexPositions[i] == contrTrn.FirstVertex ||
+                            _vertexPositions[i] == contrTrn.SecondVertex ||
+                            _vertexPositions[i] == contrTrn.ThirdVertex)
+                            _vertexPositions[i] += (_vertexPositions[i] - Engine.ActiveControlAxis.Position) * scale;
+                    }
+                    for (int i = 0; i < _vertexData.Length; i++)
+                    {
+                        if (_vertexData[i].Position == contrTrn.FirstVertex ||
+                            _vertexData[i].Position == contrTrn.SecondVertex ||
+                            _vertexData[i].Position == contrTrn.ThirdVertex)
+                            _vertexData[i].Position += (_vertexData[i].Position - Engine.ActiveControlAxis.Position) * scale;
+                    }
+
+                    for (int i = 0; i < _controlVertices.Count; i++)
+                    {
+                        if (_controlVertices[i].Position == contrTrn.FirstVertex ||
+                            _controlVertices[i].Position == contrTrn.SecondVertex ||
+                            _controlVertices[i].Position == contrTrn.ThirdVertex)
+                            _controlVertices[i].Position += (_controlVertices[i].Position - Engine.ActiveControlAxis.Position) * scale;
+                    }
+                    for (int i = 0; i < _controlEdges.Count; i++)
+                    {
+                        if (_controlEdges[i].FirstVertex == contrTrn.FirstVertex ||
+                            _controlEdges[i].FirstVertex == contrTrn.SecondVertex ||
+                            _controlEdges[i].FirstVertex == contrTrn.ThirdVertex)
+                            _controlEdges[i].FirstVertex += (_controlEdges[i].FirstVertex - Engine.ActiveControlAxis.Position) * scale;
+                        if (_controlEdges[i].SecondVertex == contrTrn.FirstVertex ||
+                            _controlEdges[i].SecondVertex == contrTrn.SecondVertex ||
+                            _controlEdges[i].SecondVertex == contrTrn.ThirdVertex)
+                            _controlEdges[i].SecondVertex += (_controlEdges[i].SecondVertex - Engine.ActiveControlAxis.Position) * scale;
+                    }
+                    for (int i = 0; i < _controlTriangles.Count; i++)
+                    {
+                        if (_controlTriangles[i].IsSelected)
+                            continue;
+
+                        if (_controlTriangles[i].FirstVertex == contrTrn.FirstVertex ||
+                            _controlTriangles[i].FirstVertex == contrTrn.SecondVertex ||
+                            _controlTriangles[i].FirstVertex == contrTrn.ThirdVertex)
+                            _controlTriangles[i].FirstVertex += (_controlTriangles[i].FirstVertex - Engine.ActiveControlAxis.Position) * scale;
+                        if (_controlTriangles[i].SecondVertex == contrTrn.FirstVertex ||
+                            _controlTriangles[i].SecondVertex == contrTrn.SecondVertex ||
+                            _controlTriangles[i].SecondVertex == contrTrn.ThirdVertex)
+                            _controlTriangles[i].SecondVertex += (_controlTriangles[i].SecondVertex - Engine.ActiveControlAxis.Position) * scale;
+                        if (_controlTriangles[i].ThirdVertex == contrTrn.FirstVertex ||
+                            _controlTriangles[i].ThirdVertex == contrTrn.SecondVertex ||
+                            _controlTriangles[i].ThirdVertex == contrTrn.ThirdVertex)
+                            _controlTriangles[i].ThirdVertex += (_controlTriangles[i].ThirdVertex - Engine.ActiveControlAxis.Position) * scale;
+                    }
+
+                    contrTrn.Scale(scale, Engine.ActiveControlAxis.Position);
+                }
+            }
+
+            RecalcBoundingBox();
+            RecalcNormals();
+        }
+        #endregion
+
+        #region Deteling
+        public void DeleteVertex()
+        {
+            List<Vector3> vPos = _vertexPositions.ToList();
+
+            List<ControlTriangle> delTris = new List<ControlTriangle>();
+            List<ControlVertex> delVerts = _controlVertices.Where(x => x.IsSelected).ToList();
+
+            delVerts.ForEach(v =>
+            {
+                _controlTriangles.ForEach(ct =>
+                {
+                    if (ct.FirstVertex == v.Position || ct.SecondVertex == v.Position || ct.ThirdVertex == v.Position)
+                        if (!delTris.Contains(ct))
+                            delTris.Add(ct);
+                });
+
+                _controlTriangles.RemoveAll(ct =>
+                    ct.FirstVertex == v.Position || ct.SecondVertex == v.Position || ct.ThirdVertex == v.Position);
+                _controlEdges.RemoveAll(e => e.FirstVertex == v.Position || e.SecondVertex == v.Position);
+                _controlVertices.Remove(v);
+                vPos.RemoveAll(vp => vp == v.Position);
+
+                Engine.TriangleSelectionPool.RemoveAll(ct =>
+                    ct.FirstVertex == v.Position || ct.SecondVertex == v.Position || ct.ThirdVertex == v.Position);
+                Engine.EdgeSelectionPool.RemoveAll(e => e.FirstVertex == v.Position || e.SecondVertex == v.Position);
+                Engine.VertexSelectionPool.Remove(v);
+            });
+
+            _primitiveCount -= delTris.Count;
+            _vertexPositions = vPos.ToArray();
+
+            _vertexData = RemoveVertexData(delTris);
+
+            RecalcBoundingBox();
+        }
+
+        public void DeleteEdge()
+        {
+            List<ControlTriangle> delTris = new List<ControlTriangle>();
+            List<ControlEdge> delEdges = _controlEdges.Where(x => x.IsSelected).ToList();
+
+            delEdges.ForEach(e =>
+            {
+                _controlTriangles.ForEach(ct =>
+                {
+                    if (ct.Contains(e) && !delTris.Contains(ct))
+                        delTris.Add(ct);
+                });
+
+                _controlTriangles.RemoveAll(ct => ct.Contains(e));
+                _controlEdges.Remove(e);
+
+                Engine.TriangleSelectionPool.RemoveAll(ct => ct.Contains(e));
+                Engine.EdgeSelectionPool.Remove(e);
+            });
+
+            _primitiveCount -= delTris.Count;
+
+            _vertexData = RemoveVertexData(delTris);
+
+            RecalcBoundingBox();
+        }
+
+        public void DeleteTriangle()
+        {
+            List<ControlTriangle> delTris = _controlTriangles.Where(x => x.IsSelected).ToList();
+
+            delTris.ForEach(t =>
+            {
+                _controlTriangles.Remove(t);
+                Engine.TriangleSelectionPool.Remove(t);
+            });
+
+            _primitiveCount -= delTris.Count;
+
+            _vertexData = RemoveVertexData(delTris);
+
+            RecalcBoundingBox();
+        }
+        #endregion
+
+        public void RestoreData(SceneEntityData data)
+        {
+            _center = data.Center;
+            _position = data.Position;
+            //_controlVertices = data.ControlVertices;
+            //_controlEdges = data.ControlEdges;
+            //_controlTriangles = data.ControlTriangles;
+            _primitiveCount = data.PrimitiveCount;
+            _vertexData = data.VertexData;
+            _vertexPositions = data.VertexPositions;
+        }
 
         private void DrawConrtolVertices()
         {
@@ -617,15 +1048,35 @@ namespace Diplom
 
         private void RecalcNormals()
         {
-            _center = Vector3.Zero;
             for (int i = 0; i < _vertexData.Length; i += 3)
             {
-                Vector3 normal = Vector3.Cross(_vertexData[i + 2].Position - _vertexData[i].Position, _vertexData[i + 1].Position - _vertexData[i].Position);
+                Vector3 normal = Vector3.Cross(_vertexData[i + 1].Position - _vertexData[i].Position, _vertexData[i + 2].Position - _vertexData[i].Position);
                 normal.Normalize();
                 _vertexData[i].Normal = normal;
-                _vertexData[i+1].Normal = normal;
-                _vertexData[i+2].Normal = normal;
+                _vertexData[i + 1].Normal = normal;
+                _vertexData[i + 2].Normal = normal;
             }
+        }
+
+        private VertexPositionNormalTexture[] RemoveVertexData(List<ControlTriangle> deletedTris)
+        {
+            List<VertexPositionNormalTexture> vData = _vertexData.ToList();
+            List<int> inds = new List<int>();
+
+            deletedTris.ForEach(dt =>
+            {
+                for (int i = 0; i < vData.Count; i += 3)
+                {
+                    if (vData[i].Position == dt.FirstVertex &&
+                        vData[i + 1].Position == dt.SecondVertex &&
+                        vData[i + 2].Position == dt.ThirdVertex)
+                        inds.AddRange(new[] { i, i + 1, i + 2 });
+                }
+            });
+            inds = inds.OrderByDescending(i => i).ToList();
+            inds.ForEach(i => vData.RemoveAt(i));
+
+            return vData.ToArray();
         }
     }
 }

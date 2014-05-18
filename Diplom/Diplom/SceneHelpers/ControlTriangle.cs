@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
-using Diplom.Intefaces;
 using Diplom.Primitives;
 
 namespace Diplom.SceneHelpers
@@ -13,12 +12,12 @@ namespace Diplom.SceneHelpers
     {
         private BasicEffect _effect;
         private Matrix _vertexWorld = Matrix.Identity;
-        private Color _usualColor = new Color(0,0,150,150);
-        private Color _highlightColor = new Color(150, 0, 0, 150);
+        private Color _usualColor = new Color(0, 0, 150, 150);
+        private Color _highlightColor = new Color(100, 0, 0, 100);
 
         private VertexPositionColor[] _vertexData;
 
-        public Vector3 FirstVertex 
+        public Vector3 FirstVertex
         {
             get { return _vertexData[0].Position; }
             set { _vertexData[0].Position = value; }
@@ -67,23 +66,45 @@ namespace Diplom.SceneHelpers
             SecondVertex += delta;
             ThirdVertex += delta;
         }
+        public void TranslateToPoint(Vector3 point)
+        {
+            FirstVertex = point;
+            SecondVertex = point;
+            ThirdVertex = point;
+        }
+        public void Rotate(Quaternion qRotate, Vector3 center)
+        {
+            FirstVertex = Vector3.Transform(FirstVertex - center, qRotate) + center;
+            SecondVertex = Vector3.Transform(SecondVertex - center, qRotate) + center;
+            ThirdVertex = Vector3.Transform(ThirdVertex - center, qRotate) + center;
+        }
+        public void Scale(Vector3 scale, Vector3 center)
+        {
+            FirstVertex += (FirstVertex - center) * scale;
+            SecondVertex += (SecondVertex - center) * scale;
+            ThirdVertex += (ThirdVertex - center) * scale;
+        }
 
         public void Draw()
         {
-            //Engine.ActiveGraphicsDevice.BlendState = BlendState.Additive;
+            if (!IsSelected) return;
 
             _effect.World = Matrix.Identity;
             _effect.View = Engine.ActiveCamera.ViewMatrix;
             _effect.Projection = Engine.ActiveCamera.ProjectionMatrix;
 
-            _effect.DiffuseColor = IsSelected ? _highlightColor.ToVector3() : _usualColor.ToVector3();
+            _effect.DiffuseColor = _highlightColor.ToVector3();
             _effect.EmissiveColor = _effect.DiffuseColor;
 
             _effect.CurrentTechnique.Passes[0].Apply();
 
             Engine.ActiveGraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, _vertexData, 0, 1);
+        }
 
-            //Engine.ActiveGraphicsDevice.BlendState = BlendState.Opaque;
+        public bool Contains(ControlEdge edge)
+        {
+            return (FirstVertex == edge.FirstVertex || SecondVertex == edge.FirstVertex || ThirdVertex == edge.FirstVertex) &&
+                   (FirstVertex == edge.SecondVertex || SecondVertex == edge.SecondVertex || ThirdVertex == edge.SecondVertex);
         }
     }
 }

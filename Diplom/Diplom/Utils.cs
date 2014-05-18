@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Diplom.SceneHelpers;
+using System.Reflection;
 
 namespace Diplom
 {
@@ -141,5 +142,5 @@ namespace Diplom
 
             return rayDistance;
         }
-    }
+   }
 }

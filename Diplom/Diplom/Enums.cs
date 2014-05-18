@@ -17,18 +17,24 @@ namespace Diplom
         None
     }
 
-    public enum TransformationMode
+    public enum TransformationMode : int
     {
-        Translate,
-        Rotate,
-        Scale
+        Translate = 0,
+        Rotate = 1,
+        Scale = 2
     }
 
-    public enum SubObjectMode
+    public enum SubObjectMode : int
     {
-        None,
-        Vertex,
-        Edge,
-        Triangle
+        None = 0,
+        Vertex = 1,
+        Edge = 2,
+        Triangle = 3
+    }
+
+    public enum DrawMode : int
+    {
+        EntityOnly = 0,
+        WithEdges = 1
     }
 }

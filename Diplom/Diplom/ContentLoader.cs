@@ -18,6 +18,7 @@ namespace Diplom
         private Dictionary<string, Model> _loadedModels = new Dictionary<string, Model>();
         private Dictionary<string, Effect> _loadedEffects = new Dictionary<string, Effect>();
         private Dictionary<string, Texture2D> _loadedTextures = new Dictionary<string, Texture2D>();
+        private Dictionary<string, SpriteFont> _loadedFonts = new Dictionary<string, SpriteFont>();
 
         public ContentLoader(IServiceProvider serviceProvider)
         {
@@ -97,6 +98,27 @@ namespace Diplom
                 throw new Exception(buildError);
             }
         }
+        public SpriteFont LoadFont(string fileName, string fontName)
+        {
+            if (_loadedFonts.ContainsKey(fontName))
+                return _loadedFonts[fontName];
+
+            _contentBuilder.Add(GetContentPath(fileName), fontName, null, null);
+
+            string buildError = _contentBuilder.Build();
+
+            if (string.IsNullOrEmpty(buildError))
+            {
+                SpriteFont font = _contentManager.Load<SpriteFont>(fontName);
+                _loadedFonts.Add(fontName, font);
+
+                return font;
+            }
+            else
+            {
+                throw new Exception(buildError);
+            }
+        }
 
         public Model GetLoadedModel(string modelName)
         {
@@ -109,6 +131,10 @@ namespace Diplom
         public Texture2D GetLoadedTexture(string textureName)
         {
             return _loadedTextures[textureName];
+        }
+        public SpriteFont GetLoadedFont(string fontName)
+        {
+            return _loadedFonts[fontName];
         }
     }
 }

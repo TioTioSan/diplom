@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
-using Diplom.Intefaces;
 
 namespace Diplom.SceneHelpers
 {
-    public sealed class SnapGrid : IDrawable
+    public sealed class SnapGrid
     {
         public bool Enabled = true;
 
@@ -20,7 +19,7 @@ namespace Diplom.SceneHelpers
             }
         }
 
-        private int gridSize = 128;
+        private int gridSize = 100;
 
         /// <summary>
         /// Number of lines in total.

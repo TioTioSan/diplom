@@ -4,18 +4,16 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
-using Diplom.Intefaces;
 using System.Windows.Forms;
 
 namespace Diplom.SceneHelpers
 {
-    public class ControlAxis : IDrawable
+    public class ControlAxis
     {
         private readonly BasicEffect _lineEffect;
         private readonly BasicEffect _meshEffect;
+        private readonly SpriteFont _font;
 
-        private GraphicsDevice _graphics;
-        private Camera _camera;
         private Matrix _axisWorld = Matrix.Identity;
 
         private VertexPositionColor[] _lineVertices;
@@ -41,6 +39,10 @@ namespace Diplom.SceneHelpers
         private float _screenScale;
 
         private bool _isTransforming = false;
+
+        public Vector3 X_AxisDirection { get; private set; }
+        public Vector3 Y_AxisDirection { get; private set; }
+        public Vector3 Z_AxisDirection { get; private set; }
 
         #region BoundingBoxes
         private const float MULTI_AXIS_THICKNESS = 0.05f;
@@ -169,19 +171,34 @@ namespace Diplom.SceneHelpers
         public Vector3 Position
         {
             get { return _position; }
-            set { _position = value; }
+            set
+            {
+                _position = value;
+
+                if (_position.X == float.MaxValue) return;
+
+                if (Engine.ActiveTransformMode == TransformationMode.Translate)
+                    Engine.MainForm.SetNumericUpDowns(_position);
+            }
         }
 
-        public bool IsEnabled { get; set; }
+        private bool _isEnabled = false;
+        public bool IsEnabled
+        {
+            get { return _isEnabled; }
+            set
+            {
+                _isEnabled = value;
+                if (!_isEnabled)
+                    Position = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+            }
+        }
 
         public bool IsTransforming { get { return _isTransforming; } }
 
 
-        public ControlAxis(GraphicsDevice graphics, Camera camera)
+        public ControlAxis()
         {
-            _graphics = graphics;
-            _camera = camera;
-
             _axisColors = new Color[3];
             _axisColors[0] = Color.Red;
             _axisColors[1] = Color.Green;
@@ -194,8 +211,14 @@ namespace Diplom.SceneHelpers
             _axisText[1] = "Y";
             _axisText[2] = "Z";
 
+            //_font = Engine.ContentLoader.GetLoadedFont("DiplomFont");
+
+            X_AxisDirection = Vector3.Right;
+            Y_AxisDirection = Vector3.Up;
+            Z_AxisDirection = Vector3.Forward;
+
             #region Line init
-            _lineEffect = new BasicEffect(graphics) { VertexColorEnabled = true, AmbientLightColor = Vector3.One, EmissiveColor = Vector3.One };
+            _lineEffect = new BasicEffect(Engine.ActiveGraphicsDevice) { VertexColorEnabled = true, AmbientLightColor = Vector3.One, EmissiveColor = Vector3.One };
 
             var vertexList = new List<VertexPositionColor>(18);
 
@@ -239,7 +262,7 @@ namespace Diplom.SceneHelpers
             #endregion
 
             #region Helpers geomerty init
-            _meshEffect = new BasicEffect(graphics);
+            _meshEffect = new BasicEffect(Engine.ActiveGraphicsDevice);
 
             _modelLocalSpace = new Matrix[3];
             _modelLocalSpace[0] = Matrix.CreateWorld(new Vector3(LINE_LENGTH, 0, 0), Vector3.Left, Vector3.Up);
@@ -257,7 +280,7 @@ namespace Diplom.SceneHelpers
             _quads[2] = new Quad(new Vector3(0, halfLineOffset, halfLineOffset), Vector3.Right, Vector3.Up, LINE_OFFSET,
                                  LINE_OFFSET); //YZ 
 
-            _quadEffect = new BasicEffect(graphics) { DiffuseColor = _highlightColor.ToVector3(), Alpha = 0.5f };
+            _quadEffect = new BasicEffect(Engine.ActiveGraphicsDevice) { DiffuseColor = _highlightColor.ToVector3(), Alpha = 0.5f };
             _quadEffect.EnableDefaultLighting();
             #endregion
         }
@@ -267,14 +290,22 @@ namespace Diplom.SceneHelpers
         {
             if (!IsEnabled) return;
 
-            if (ActiveAxis != Axis.None) _isTransforming = true;
+            if (ActiveAxis != Axis.None)
+            {
+                Engine.StartAction();
+                _isTransforming = true;
+            }
         }
 
         public void MouseUp(Vector2 position)
         {
             if (!IsEnabled) return;
 
-            if (_isTransforming) _isTransforming = false;
+            if (_isTransforming)
+            {
+                Engine.EndAction();
+                _isTransforming = false;
+            }
         }
 
         public void MyMouseDrag(Vector2 pos, Vector2 delta, MouseButtons btn)
@@ -294,7 +325,6 @@ namespace Diplom.SceneHelpers
         {
             if (!IsEnabled) return;
 
-            _camera = camera;
             Vector3 vLength = camera.Position - _position;
             const float scaleFactor = 25;
 
@@ -303,7 +333,7 @@ namespace Diplom.SceneHelpers
 
             _axisWorld = _screenScaleMatrix * Matrix.CreateWorld(_position, Vector3.Forward, Vector3.Up);
 
-            _graphics.DepthStencilState = DepthStencilState.None;
+            Engine.ActiveGraphicsDevice.DepthStencilState = DepthStencilState.None;
 
             #region Draw lines
             _lineEffect.World = _axisWorld;
@@ -311,15 +341,15 @@ namespace Diplom.SceneHelpers
             _lineEffect.Projection = camera.ProjectionMatrix;
 
             _lineEffect.CurrentTechnique.Passes[0].Apply();
-            _graphics.DrawUserPrimitives(PrimitiveType.LineList, _lineVertices, 0, _lineVertices.Length / 2);
+            Engine.ActiveGraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, _lineVertices, 0, _lineVertices.Length / 2);
             #endregion
 
             #region Draw quad
             if (ActiveAxis == Axis.XY || ActiveAxis == Axis.YZ ||
                 ActiveAxis == Axis.XYZ || ActiveAxis == Axis.ZX)
             {
-                _graphics.BlendState = BlendState.AlphaBlend;
-                _graphics.RasterizerState = RasterizerState.CullNone;
+                Engine.ActiveGraphicsDevice.BlendState = BlendState.AlphaBlend;
+                Engine.ActiveGraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
                 _quadEffect.World = _axisWorld;
                 _quadEffect.View = camera.ViewMatrix;
@@ -330,30 +360,30 @@ namespace Diplom.SceneHelpers
                 switch (ActiveAxis)
                 {
                     case Axis.XY:
-                        _graphics.DrawUserIndexedPrimitives(PrimitiveType.TriangleList,
+                        Engine.ActiveGraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleList,
                                                     _quads[0].Vertices, 0, 4,
                                                     _quads[0].Indexes, 0, 2);
                         break;
                     case Axis.ZX:
-                        _graphics.DrawUserIndexedPrimitives(PrimitiveType.TriangleList,
+                        Engine.ActiveGraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleList,
                                                     _quads[1].Vertices, 0, 4,
                                                     _quads[1].Indexes, 0, 2);
                         break;
                     case Axis.YZ:
-                        _graphics.DrawUserIndexedPrimitives(PrimitiveType.TriangleList,
+                        Engine.ActiveGraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleList,
                                                     _quads[2].Vertices, 0, 4,
                                                     _quads[2].Indexes, 0, 2);
                         break;
                     case Axis.XYZ:
                         for (int i = 0; i < _quads.Length; i++)
-                            _graphics.DrawUserIndexedPrimitives(PrimitiveType.TriangleList,
+                            Engine.ActiveGraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleList,
                                                                 _quads[i].Vertices, 0, 4,
                                                                 _quads[i].Indexes, 0, 2);
                         break;
                 }
 
-                _graphics.BlendState = BlendState.Opaque;
-                _graphics.RasterizerState = RasterizerState.CullCounterClockwise;
+                Engine.ActiveGraphicsDevice.BlendState = BlendState.Opaque;
+                Engine.ActiveGraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
             }
             #endregion
 
@@ -371,13 +401,15 @@ namespace Diplom.SceneHelpers
 
                 _meshEffect.CurrentTechnique.Passes[0].Apply();
 
-                _graphics.DrawUserIndexedPrimitives(PrimitiveType.TriangleList,
+                Engine.ActiveGraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleList,
                     _axisGeomerty.Vertices, 0, _axisGeomerty.Vertices.Length,
                     _axisGeomerty.Indices, 0, _axisGeomerty.Indices.Length / 3);
             }
             #endregion
 
-            _graphics.DepthStencilState = DepthStencilState.Default;
+            Engine.ActiveGraphicsDevice.DepthStencilState = DepthStencilState.Default;
+
+            //Draw2D();
         }
 
         public void SubObjectModeChanged()
@@ -397,32 +429,59 @@ namespace Diplom.SceneHelpers
                     if (Engine.EdgeSelectionPool.Count != 0)
                         newPos = Utils.GetCenter(Engine.EdgeSelectionPool);
                     break;
+                case SubObjectMode.Triangle:
+                    if (Engine.TriangleSelectionPool.Count != 0)
+                        newPos = Utils.GetCenter(Engine.TriangleSelectionPool);
+                    break;
             }
             if (newPos.HasValue)
             {
-                _position = newPos.Value;
+                Position = newPos.Value;
                 IsEnabled = true;
             }
             else
                 IsEnabled = false;
         }
 
-        public void SetDirections(Vector3 up, Vector3 forward)
-        {
-
-        }
-
         public void Translate(Vector3 delta)
         {
-            _position += delta;
+            Position += delta;
         }
 
         private void SelectAxis(Vector2 mousePosition)
         {
+            float? intersection;
             float closestintersection = float.MaxValue;
             Ray ray = Engine.CurrentMouseRay;
 
-            if (ActiveMode == TransformationMode.Translate)
+            if (ActiveMode == TransformationMode.Rotate || ActiveMode == TransformationMode.Scale)
+            {
+                #region BoundingSpheres
+                intersection = XSphere.Intersects(ray);
+                if (intersection.HasValue)
+                    if (intersection.Value < closestintersection)
+                    {
+                        ActiveAxis = Axis.X;
+                        closestintersection = intersection.Value;
+                    }
+                intersection = YSphere.Intersects(ray);
+                if (intersection.HasValue)
+                    if (intersection.Value < closestintersection)
+                    {
+                        ActiveAxis = Axis.Y;
+                        closestintersection = intersection.Value;
+                    }
+                intersection = ZSphere.Intersects(ray);
+                if (intersection.HasValue)
+                    if (intersection.Value < closestintersection)
+                    {
+                        ActiveAxis = Axis.Z;
+                        closestintersection = intersection.Value;
+                    }
+                #endregion
+            }
+
+            if (ActiveMode == TransformationMode.Translate || ActiveMode == TransformationMode.Scale)
             {
                 // transform ray into local-space of the boundingboxes.
                 ray.Direction = Vector3.TransformNormal(ray.Direction, Matrix.Invert(_axisWorld));
@@ -430,7 +489,7 @@ namespace Diplom.SceneHelpers
             }
 
             #region X,Y,Z Boxes
-            float? intersection = XAxisBox.Intersects(ray);
+            intersection = XAxisBox.Intersects(ray);
             if (intersection.HasValue)
                 if (intersection.Value < closestintersection)
                 {
@@ -457,34 +516,6 @@ namespace Diplom.SceneHelpers
             }
             #endregion
 
-            if (ActiveMode == TransformationMode.Rotate || ActiveMode == TransformationMode.Scale)
-            {
-                #region BoundingSpheres
-
-                intersection = XSphere.Intersects(ray);
-                if (intersection.HasValue)
-                    if (intersection.Value < closestintersection)
-                    {
-                        ActiveAxis = Axis.X;
-                        closestintersection = intersection.Value;
-                    }
-                intersection = YSphere.Intersects(ray);
-                if (intersection.HasValue)
-                    if (intersection.Value < closestintersection)
-                    {
-                        ActiveAxis = Axis.Y;
-                        closestintersection = intersection.Value;
-                    }
-                intersection = ZSphere.Intersects(ray);
-                if (intersection.HasValue)
-                    if (intersection.Value < closestintersection)
-                    {
-                        ActiveAxis = Axis.Z;
-                        closestintersection = intersection.Value;
-                    }
-
-                #endregion
-            }
             if (ActiveMode == TransformationMode.Translate || ActiveMode == TransformationMode.Scale)
             {
                 // if no axis was hit (x,y,z) set value to lowest possible to select the 'farthest' intersection for the XY,XZ,YZ boxes. 
@@ -518,6 +549,42 @@ namespace Diplom.SceneHelpers
             }
             if (closestintersection >= float.MaxValue || closestintersection <= float.MinValue)
                 ActiveAxis = Axis.None;
+        }
+
+        private void Draw2D()
+        {
+            Engine.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
+
+            // -- Draw Axis identifiers ("X,Y,Z") -- // 
+            for (int i = 0; i < 3; i++)
+            {
+                Vector3 screenPos =
+                  Engine.ActiveGraphicsDevice.Viewport.Project(_modelLocalSpace[i].Translation + _modelLocalSpace[i].Backward + _axisTextOffset,
+                                             Engine.ActiveCamera.ProjectionMatrix, Engine.ActiveCamera.ViewMatrix, _axisWorld);
+
+                if (screenPos.Z < 0f || screenPos.Z > 1.0f)
+                    continue;
+
+                Color color = _axisColors[i];
+                switch (i)
+                {
+                    case 0:
+                        if (ActiveAxis == Axis.X || ActiveAxis == Axis.XY || ActiveAxis == Axis.ZX)
+                            color = _highlightColor;
+                        break;
+                    case 1:
+                        if (ActiveAxis == Axis.Y || ActiveAxis == Axis.XY || ActiveAxis == Axis.YZ)
+                            color = _highlightColor;
+                        break;
+                    case 2:
+                        if (ActiveAxis == Axis.Z || ActiveAxis == Axis.YZ || ActiveAxis == Axis.ZX)
+                            color = _highlightColor;
+                        break;
+                }
+
+                Engine.SpriteBatch.DrawString(_font, _axisText[i], new Vector2(screenPos.X, screenPos.Y), color);
+            }
+            Engine.SpriteBatch.End();
         }
 
         #region Helpers
