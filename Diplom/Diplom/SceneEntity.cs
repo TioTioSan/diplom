@@ -818,12 +818,38 @@ namespace Diplom
         {
             _center = data.Center;
             _position = data.Position;
-            //_controlVertices = data.ControlVertices;
-            //_controlEdges = data.ControlEdges;
-            //_controlTriangles = data.ControlTriangles;
+
+            if (data.VertData.Count == _controlVertices.Count)
+                for (int i = 0; i < data.VertData.Count; i++)
+                    _controlVertices[i].Position = data.VertData[i].Position;
+            else
+                Utils.SyncVertexLists(ref _controlVertices, data.VertData);
+
+            if (data.EdgeData.Count == _controlEdges.Count)
+                for (int i = 0; i < data.EdgeData.Count; i++)
+                {
+                    _controlEdges[i].FirstVertex = data.EdgeData[i].FirstVertex;
+                    _controlEdges[i].SecondVertex = data.EdgeData[i].SecondVertex;
+                }
+            else
+                Utils.SyncEdgeLists(ref _controlEdges, data.EdgeData);
+
+            if (data.TrianData.Count == _controlTriangles.Count)
+                for (int i = 0; i < data.TrianData.Count; i++)
+                {
+                    _controlTriangles[i].FirstVertex = data.TrianData[i].FirstVertex;
+                    _controlTriangles[i].SecondVertex = data.TrianData[i].SecondVertex;
+                    _controlTriangles[i].ThirdVertex = data.TrianData[i].ThirdVertex;
+                }
+            else
+                Utils.SyncTriangleLists(ref _controlTriangles, data.TrianData);
+
             _primitiveCount = data.PrimitiveCount;
             _vertexData = data.VertexData;
             _vertexPositions = data.VertexPositions;
+
+            RecalcBoundingBox();
+            RecalcNormals();
         }
 
         private void DrawConrtolVertices()

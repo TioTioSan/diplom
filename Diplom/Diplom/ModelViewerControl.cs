@@ -37,7 +37,7 @@ namespace Diplom
         {
             _dottedLine = Engine.ContentLoader.GetLoadedTexture("DottedLine");
 
-            _camera = new Camera(GraphicsDevice.Viewport.AspectRatio, new Vector3(50f, 50f, 50f), Vector3.Zero);
+            _camera = new Camera(GraphicsDevice.Viewport.AspectRatio, new Vector3(6f, 6f, 6f), Vector3.Zero);
             _snapGrid = new SnapGrid(GraphicsDevice, 10);
             _controlAxis = new ControlAxis();
             _spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -72,7 +72,7 @@ namespace Diplom
 
         public void AddNewSceneEntity()
         {
-            Engine.StartAction();
+            Engine.StartAction(ActionType.EntityCount);
             Engine.SceneEntities.Add(new SceneEntity(new Cube()));
             Engine.EndAction();
         }
@@ -95,7 +95,7 @@ namespace Diplom
 
             if (_selectionRect.X != -1 && !Engine.ActiveControlAxis.IsTransforming && deltaX != 0 && deltaY != 0)
             {
-                Engine.StartAction();
+                Engine.StartAction(ActionType.Selection);
                 switch (Engine.ActiveSubObjectMode)
                 {
                     case SubObjectMode.None:
@@ -188,41 +188,49 @@ namespace Diplom
             #region Deleting
             if (e.KeyCode == Keys.Delete)
             {
-                if (Engine.EntitySelectionPool.Count == 0)
-                    return;
+                if (Engine.EntitySelectionPool.Count == 0) return;
+
                 switch (Engine.ActiveSubObjectMode)
                 {
                     case SubObjectMode.None:
+                        Engine.StartAction(ActionType.EntityCount);
                         foreach (var item in Engine.EntitySelectionPool)
                             Engine.SceneEntities.Remove(item);
                         Engine.EntitySelectionPool.Clear();
                         Engine.SelectionChanged();
+                        Engine.EndAction();
                         break;
                     case SubObjectMode.Vertex:
-                        if (Engine.VertexSelectionPool.Count != 0) 
+                        if (Engine.VertexSelectionPool.Count != 0)
                         {
+                            Engine.StartAction(ActionType.VertexData);
                             foreach (var item in Engine.EntitySelectionPool)
                                 item.DeleteVertex();
                             Engine.VertexSelectionPool.Clear();
                             Engine.SelectionChanged();
+                            Engine.EndAction();
                         }
                         break;
                     case SubObjectMode.Edge:
                         if (Engine.EdgeSelectionPool.Count != 0)
                         {
+                            Engine.StartAction(ActionType.VertexData);
                             foreach (var item in Engine.EntitySelectionPool)
                                 item.DeleteEdge();
                             Engine.EdgeSelectionPool.Clear();
                             Engine.SelectionChanged();
+                            Engine.EndAction();
                         }
                         break;
                     case SubObjectMode.Triangle:
                         if (Engine.TriangleSelectionPool.Count != 0)
                         {
+                            Engine.StartAction(ActionType.VertexData);
                             foreach (var item in Engine.EntitySelectionPool)
                                 item.DeleteTriangle();
                             Engine.TriangleSelectionPool.Clear();
                             Engine.SelectionChanged();
+                            Engine.EndAction();
                         }
                         break;
                 }
@@ -233,7 +241,7 @@ namespace Diplom
 
         private void MyMouseClick(int x, int y)
         {
-            Engine.StartAction();
+            Engine.StartAction(ActionType.Selection);
             switch (Engine.ActiveSubObjectMode)
             {
                 case SubObjectMode.None:

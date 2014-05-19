@@ -63,7 +63,7 @@ namespace Diplom
                 if (_activeSubObjectMode == value) return;
 
                 if (!IsRestore)
-                    StartAction();
+                    StartAction(ActionType.SubObjMode);
 
                 _activeSubObjectMode = value;
                 ActiveControlAxis.SubObjectModeChanged();
@@ -170,9 +170,32 @@ namespace Diplom
             }
         }
 
-        public static void StartAction()
+        public static void ResetAxisPos()
         {
-            StartSceneState = new SceneState();
+            switch (ActiveSubObjectMode)
+            {
+                case SubObjectMode.None:
+                    if (EntitySelectionPool.Count > 0)
+                        ActiveControlAxis.Position = Utils.GetCenter(EntitySelectionPool);
+                    break;
+                case SubObjectMode.Vertex:
+                    if (VertexSelectionPool.Count > 0)
+                        ActiveControlAxis.Position = Utils.GetCenter(VertexSelectionPool);
+                    break;
+                case SubObjectMode.Edge:
+                    if (EdgeSelectionPool.Count > 0)
+                        ActiveControlAxis.Position = Utils.GetCenter(EdgeSelectionPool);
+                    break;
+                case SubObjectMode.Triangle:
+                    if (TriangleSelectionPool.Count > 0)
+                        ActiveControlAxis.Position = Utils.GetCenter(TriangleSelectionPool);
+                    break;
+            }
+        }
+
+        public static void StartAction(ActionType actionType)
+        {
+            StartSceneState = new SceneState(actionType);
         }
         public static void EndAction()
         {
@@ -196,7 +219,7 @@ namespace Diplom
         {
             if (UndoStack.Count != 0)
             {
-                RedoStack.Add(new SceneState());
+                RedoStack.Add(new SceneState(UndoStack.Last().ActionType));
                 UndoStack.Last().Restore();
                 UndoStack.Remove(UndoStack.Last());
             }
@@ -205,7 +228,7 @@ namespace Diplom
         {
             if (RedoStack.Count != 0)
             {
-                UndoStack.Add(new SceneState());
+                UndoStack.Add(new SceneState(RedoStack.Last().ActionType));
                 RedoStack.Last().Restore();
                 RedoStack.Remove(RedoStack.Last());
             }

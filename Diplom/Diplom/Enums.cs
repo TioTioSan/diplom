@@ -37,4 +37,12 @@ namespace Diplom
         EntityOnly = 0,
         WithEdges = 1
     }
+
+    public enum ActionType : int
+    {
+        SubObjMode = 0,
+        EntityCount = 1,
+        Selection = 2,
+        VertexData = 3
+    }
 }

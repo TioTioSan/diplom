@@ -142,5 +142,123 @@ namespace Diplom
 
             return rayDistance;
         }
-   }
+
+        public static void SyncVertexLists(ref List<ControlVertex> contrVert, List<Vert> vertData)
+        {
+            if (vertData.Count > contrVert.Count)
+            {
+                for (int i = 0; i < vertData.Count; i++)
+                {
+                    if (i == contrVert.Count || contrVert[i].Position != vertData[i].Position)
+                    {
+                        contrVert.Insert(i, new ControlVertex(vertData[i].Position));
+                        if (Engine.ActiveSubObjectMode == SubObjectMode.Vertex)
+                            Engine.VertexSelectionPool.Add(contrVert[i]);
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0; i < contrVert.Count; i++)
+                {
+                    if (i == vertData.Count || contrVert[i].Position != vertData[i].Position)
+                    {
+                        if (Engine.ActiveSubObjectMode == SubObjectMode.Vertex)
+                            Engine.VertexSelectionPool.Remove(contrVert[i]);
+                        contrVert.RemoveAt(i);
+                        i--;
+                    }
+                }
+            }
+        }
+
+        public static void SyncEdgeLists(ref List<ControlEdge> contrEdge, List<Edge> edgeData)
+        {
+            if (edgeData.Count > contrEdge.Count)
+            {
+                for (int i = 0; i < edgeData.Count; i++)
+                {
+                    if (i == contrEdge.Count || !(contrEdge[i].FirstVertex == edgeData[i].FirstVertex && contrEdge[i].SecondVertex == edgeData[i].SecondVertex))
+                    {
+                        contrEdge.Insert(i, new ControlEdge(edgeData[i].FirstVertex, edgeData[i].SecondVertex));
+                        if (Engine.ActiveSubObjectMode == SubObjectMode.Edge)
+                            Engine.EdgeSelectionPool.Add(contrEdge[i]);
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0; i < contrEdge.Count; i++)
+                {
+                    if (i == edgeData.Count || !(contrEdge[i].FirstVertex == edgeData[i].FirstVertex && contrEdge[i].SecondVertex == edgeData[i].SecondVertex))
+                    {
+                        if (Engine.ActiveSubObjectMode == SubObjectMode.Edge)
+                            Engine.EdgeSelectionPool.Remove(contrEdge[i]);
+                        contrEdge.RemoveAt(i);
+                        i--;
+                    }
+                }
+            }
+        }
+
+        public static void SyncTriangleLists(ref List<ControlTriangle> contrTrian, List<Trian> trianData)
+        {
+            if (trianData.Count > contrTrian.Count)
+            {
+                for (int i = 0; i < trianData.Count; i += 3)
+                {
+                    if (i == contrTrian.Count || !(contrTrian[i].FirstVertex == trianData[i].FirstVertex && contrTrian[i].SecondVertex == trianData[i].SecondVertex && contrTrian[i].ThirdVertex == trianData[i].ThirdVertex))
+                    {
+                        contrTrian.Insert(i, new ControlTriangle(trianData[i].FirstVertex, trianData[i].SecondVertex, trianData[i].ThirdVertex));
+                        if (Engine.ActiveSubObjectMode == SubObjectMode.Triangle)
+                            Engine.TriangleSelectionPool.Add(contrTrian[i]);
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0; i < contrTrian.Count; i += 3)
+                {
+                    if (i == trianData.Count || !(contrTrian[i].FirstVertex == trianData[i].FirstVertex && contrTrian[i].SecondVertex == trianData[i].SecondVertex && contrTrian[i].ThirdVertex == trianData[i].ThirdVertex))
+                    {
+                        if (Engine.ActiveSubObjectMode == SubObjectMode.Triangle)
+                            Engine.TriangleSelectionPool.Remove(contrTrian[i]);
+                        contrTrian.RemoveAt(i);
+                        i--;
+                    }
+                }
+            }
+        }
+    }
+
+    public struct Vert
+    {
+        public Vector3 Position;
+        public Vert(Vector3 pos)
+        {
+            Position = pos;
+        }
+    }
+    public struct Edge
+    {
+        public Vector3 FirstVertex;
+        public Vector3 SecondVertex;
+        public Edge(Vector3 fv, Vector3 sv)
+        {
+            FirstVertex = fv;
+            SecondVertex = sv;
+        }
+    }
+    public struct Trian
+    {
+        public Vector3 FirstVertex;
+        public Vector3 SecondVertex;
+        public Vector3 ThirdVertex;
+        public Trian(Vector3 fv, Vector3 sv, Vector3 tv)
+        {
+            FirstVertex = fv;
+            SecondVertex = sv;
+            ThirdVertex = tv;
+        }
+    }
 }

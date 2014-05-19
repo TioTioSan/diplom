@@ -292,7 +292,7 @@ namespace Diplom.SceneHelpers
 
             if (ActiveAxis != Axis.None)
             {
-                Engine.StartAction();
+                Engine.StartAction(ActionType.VertexData);
                 _isTransforming = true;
             }
         }
