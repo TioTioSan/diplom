@@ -12,18 +12,28 @@ namespace Diplom.SceneHelpers
         public static void PickSceneEntity()
         {
             Ray ray = Engine.CurrentMouseRay;
-            float closest = float.MaxValue;
+            List<SceneEntity> intersectedObjects = new List<SceneEntity>();
             SceneEntity obj = null;
 
-            foreach (var entity in Engine.SceneEntities)
+            Engine.SceneEntities.ForEach(ent=>
             {
-                float? intersection = entity.Select(ray);
-                if (intersection.HasValue && intersection < closest)
+                if (ent.Select(ray).HasValue)
+                    intersectedObjects.Add(ent);
+            });
+
+            float closest = float.MaxValue;
+            intersectedObjects.ForEach(ent =>
+            {
+                foreach (var tngl in ent.ControlTriangles)
                 {
-                    obj = entity;
-                    closest = intersection.Value;
+                    float? intersection = Utils.RayIntersectsTriangle(Engine.CurrentMouseRay, tngl.FirstVertex, tngl.SecondVertex, tngl.ThirdVertex);
+                    if (intersection.HasValue && intersection < closest)
+                    {
+                        obj = ent;
+                        closest = intersection.Value;
+                    }
                 }
-            }
+            });
 
             bool isObjPicked = obj != null;
             bool isAlreadySelected = isObjPicked && Engine.EntitySelectionPool.Contains(obj);

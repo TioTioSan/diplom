@@ -138,7 +138,10 @@ namespace Diplom
             switch (btn)
             {
                 case MouseButtons.Middle:
-                    Engine.ActiveCamera.RotateAroundTarget(deltaX, deltaY);
+                    if (Control.ModifierKeys == Keys.Control)
+                        Engine.ActiveCamera.Move(deltaX, deltaY);
+                    else
+                        Engine.ActiveCamera.RotateAroundTarget(deltaX, deltaY);
                     break;
 
                 case MouseButtons.Left:
@@ -183,6 +186,12 @@ namespace Diplom
             if (e.Modifiers == Keys.Control && e.KeyCode == Keys.Y)
             {
                 Engine.RedoAction();
+            }
+
+            if (e.Modifiers == Keys.Control && e.KeyCode == Keys.Q)
+            {
+                if (Engine.ActiveControlAxis.IsEnabled)
+                    Engine.ActiveCamera.LookAtSelection();
             }
 
             #region Deleting

@@ -28,6 +28,7 @@ namespace Diplom
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -35,8 +36,21 @@ namespace Diplom
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.ExportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.EditToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.AttachToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.MakeVertexToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.MakeEdgeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.MakeTriangleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.AddToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.PlaneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.CubeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.CylinderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.SphereToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.label1 = new System.Windows.Forms.Label();
             this.cmbSubObject = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
@@ -50,6 +64,7 @@ namespace Diplom
             this.nudY = new System.Windows.Forms.NumericUpDown();
             this.labelZ = new System.Windows.Forms.Label();
             this.nudZ = new System.Windows.Forms.NumericUpDown();
+            this.btnLookAtSelection = new System.Windows.Forms.Button();
             this.modelViewerControl = new Diplom.ModelViewerControl();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -61,7 +76,9 @@ namespace Diplom
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStripMenuItem});
+            this.fileToolStripMenuItem,
+            this.EditToolStripMenuItem,
+            this.AddToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(792, 24);
@@ -76,6 +93,8 @@ namespace Diplom
             this.openToolStripMenuItem,
             this.saveToolStripMenuItem,
             this.saveAsToolStripMenuItem,
+            this.toolStripSeparator3,
+            this.ExportToolStripMenuItem,
             this.toolStripSeparator1,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
@@ -86,20 +105,20 @@ namespace Diplom
             // 
             this.newToolStripMenuItem.Name = "newToolStripMenuItem";
             this.newToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
-            this.newToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.newToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
             this.newToolStripMenuItem.Text = "New";
             this.newToolStripMenuItem.Click += new System.EventHandler(this.NewToolStripMenuItem_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(149, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(143, 6);
             // 
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
             this.openToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
             this.openToolStripMenuItem.Text = "Open";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.OpenMenuClicked);
             // 
@@ -107,29 +126,120 @@ namespace Diplom
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
             this.saveToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
             this.saveToolStripMenuItem.Text = "Save";
             this.saveToolStripMenuItem.Click += new System.EventHandler(this.SaveToolStripMenuItem_Click);
             // 
             // saveAsToolStripMenuItem
             // 
             this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
-            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
             this.saveAsToolStripMenuItem.Text = "Save as";
             this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.SaveAsToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(143, 6);
+            // 
+            // ExportToolStripMenuItem
+            // 
+            this.ExportToolStripMenuItem.Name = "ExportToolStripMenuItem";
+            this.ExportToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
+            this.ExportToolStripMenuItem.Text = "Export";
+            this.ExportToolStripMenuItem.Click += new System.EventHandler(this.ExportToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(143, 6);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
             this.exitToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.ExitMenuClicked);
+            // 
+            // EditToolStripMenuItem
+            // 
+            this.EditToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.AttachToolStripMenuItem,
+            this.toolStripSeparator4,
+            this.MakeVertexToolStripMenuItem,
+            this.MakeEdgeToolStripMenuItem,
+            this.MakeTriangleToolStripMenuItem});
+            this.EditToolStripMenuItem.Name = "EditToolStripMenuItem";
+            this.EditToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
+            this.EditToolStripMenuItem.Text = "Edit";
+            // 
+            // AttachToolStripMenuItem
+            // 
+            this.AttachToolStripMenuItem.Name = "AttachToolStripMenuItem";
+            this.AttachToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
+            this.AttachToolStripMenuItem.Text = "Attach";
+            // 
+            // toolStripSeparator4
+            // 
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(180, 6);
+            // 
+            // MakeVertexToolStripMenuItem
+            // 
+            this.MakeVertexToolStripMenuItem.Name = "MakeVertexToolStripMenuItem";
+            this.MakeVertexToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.V)));
+            this.MakeVertexToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
+            this.MakeVertexToolStripMenuItem.Text = "Make vertex";
+            // 
+            // MakeEdgeToolStripMenuItem
+            // 
+            this.MakeEdgeToolStripMenuItem.Name = "MakeEdgeToolStripMenuItem";
+            this.MakeEdgeToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.E)));
+            this.MakeEdgeToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
+            this.MakeEdgeToolStripMenuItem.Text = "Make edge";
+            // 
+            // MakeTriangleToolStripMenuItem
+            // 
+            this.MakeTriangleToolStripMenuItem.Name = "MakeTriangleToolStripMenuItem";
+            this.MakeTriangleToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.T)));
+            this.MakeTriangleToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
+            this.MakeTriangleToolStripMenuItem.Text = "Make triangle";
+            // 
+            // AddToolStripMenuItem
+            // 
+            this.AddToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.PlaneToolStripMenuItem,
+            this.CubeToolStripMenuItem,
+            this.CylinderToolStripMenuItem,
+            this.SphereToolStripMenuItem});
+            this.AddToolStripMenuItem.Name = "AddToolStripMenuItem";
+            this.AddToolStripMenuItem.Size = new System.Drawing.Size(41, 20);
+            this.AddToolStripMenuItem.Text = "Add";
+            // 
+            // PlaneToolStripMenuItem
+            // 
+            this.PlaneToolStripMenuItem.Name = "PlaneToolStripMenuItem";
+            this.PlaneToolStripMenuItem.Size = new System.Drawing.Size(118, 22);
+            this.PlaneToolStripMenuItem.Text = "Plane";
+            // 
+            // CubeToolStripMenuItem
+            // 
+            this.CubeToolStripMenuItem.Name = "CubeToolStripMenuItem";
+            this.CubeToolStripMenuItem.Size = new System.Drawing.Size(118, 22);
+            this.CubeToolStripMenuItem.Text = "Cube";
+            // 
+            // CylinderToolStripMenuItem
+            // 
+            this.CylinderToolStripMenuItem.Name = "CylinderToolStripMenuItem";
+            this.CylinderToolStripMenuItem.Size = new System.Drawing.Size(118, 22);
+            this.CylinderToolStripMenuItem.Text = "Cylinder";
+            // 
+            // SphereToolStripMenuItem
+            // 
+            this.SphereToolStripMenuItem.Name = "SphereToolStripMenuItem";
+            this.SphereToolStripMenuItem.Size = new System.Drawing.Size(118, 22);
+            this.SphereToolStripMenuItem.Text = "Sphere";
             // 
             // label1
             // 
@@ -304,6 +414,17 @@ namespace Diplom
             this.nudZ.TabIndex = 5;
             this.nudZ.ValueChanged += new System.EventHandler(this.numericUpDowns_ValueChanged);
             // 
+            // btnLookAtSelection
+            // 
+            this.btnLookAtSelection.Enabled = false;
+            this.btnLookAtSelection.Location = new System.Drawing.Point(668, 440);
+            this.btnLookAtSelection.Name = "btnLookAtSelection";
+            this.btnLookAtSelection.Size = new System.Drawing.Size(112, 20);
+            this.btnLookAtSelection.TabIndex = 6;
+            this.btnLookAtSelection.Text = "Look at selection";
+            this.btnLookAtSelection.UseVisualStyleBackColor = true;
+            this.btnLookAtSelection.Click += new System.EventHandler(this.btnCameraLookAt_Click);
+            // 
             // modelViewerControl
             // 
             this.modelViewerControl.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -322,6 +443,7 @@ namespace Diplom
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(792, 472);
+            this.Controls.Add(this.btnLookAtSelection);
             this.Controls.Add(this.nudZ);
             this.Controls.Add(this.nudY);
             this.Controls.Add(this.nudX);
@@ -336,6 +458,7 @@ namespace Diplom
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.menuStrip1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "MainForm";
@@ -379,6 +502,20 @@ namespace Diplom
         private System.Windows.Forms.ToolStripMenuItem saveAsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem newToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.ToolStripMenuItem ExportToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem EditToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem MakeVertexToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem MakeEdgeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem MakeTriangleToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem AddToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem PlaneToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem CubeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem CylinderToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem SphereToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem AttachToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+        private System.Windows.Forms.Button btnLookAtSelection;
 
     }
 }

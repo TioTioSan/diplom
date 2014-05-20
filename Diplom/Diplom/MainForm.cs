@@ -11,6 +11,7 @@ using Diplom.SceneHelpers;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Collections.Generic;
 using Diplom.Forms;
+using System.Text;
 #endregion
 
 namespace Diplom
@@ -24,6 +25,12 @@ namespace Diplom
         {
             get { return cmbSubObject.Enabled; }
             set { cmbSubObject.Enabled = value; }
+        }
+
+        public bool IsEnabledBntLookAtSelection
+        {
+            get { return btnLookAtSelection.Enabled; }
+            set { btnLookAtSelection.Enabled = value; }
         }
 
         public int SubObjComboBoxSelectedIndex
@@ -112,7 +119,7 @@ namespace Diplom
             string scenesPath = Path.GetFullPath(relativePath);
 
             sfd.InitialDirectory = scenesPath;
-            sfd.FileName = "DiplomScene1.d";
+            sfd.FileName = "DiplomScene.d";
             sfd.Title = "Save scene";
             sfd.Filter = "Diplom Files (*.d)|*.d;";
 
@@ -132,6 +139,25 @@ namespace Diplom
             Engine.Reset();
             Engine.AssociatedFile = "";
             Engine.IsChangesUnsaved = false;
+        }
+
+        private void ExportToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog sfd = new SaveFileDialog();
+
+            string assemblyLocation = Assembly.GetExecutingAssembly().Location;
+            string relativePath = Path.Combine(assemblyLocation, "../Export");
+            string scenesPath = Path.GetFullPath(relativePath);
+
+            sfd.InitialDirectory = scenesPath;
+            sfd.FileName = "DiplomScene.obj";
+            sfd.Title = "Export scene";
+            sfd.Filter = "Object Files (*.obj)|*.obj;";
+
+            if (sfd.ShowDialog() == DialogResult.OK)
+            {
+                ExportScene(sfd.FileName);
+            }
         }
         #endregion
 
@@ -185,6 +211,11 @@ namespace Diplom
             modelViewerControl.MyMouseWheel(e.Delta);
         }
         #endregion
+
+        private void btnCameraLookAt_Click(object sender, EventArgs e)
+        {
+            Engine.ActiveCamera.LookAtSelection();
+        }
 
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
         {
@@ -359,6 +390,53 @@ namespace Diplom
             Cursor.Current = Cursors.Default;
         }
 
+        private void ExportScene(string fileName)
+        {
+            System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
+            customCulture.NumberFormat.NumberDecimalSeparator = ".";
+
+            var backupCulture = System.Threading.Thread.CurrentThread.CurrentCulture;
+            System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
+
+            List<Microsoft.Xna.Framework.Vector3> verts = new List<Microsoft.Xna.Framework.Vector3>();
+            List<Microsoft.Xna.Framework.Vector3> norms = new List<Microsoft.Xna.Framework.Vector3>();
+
+            StringBuilder sb = new StringBuilder();
+            foreach (var entity in Engine.SceneEntities)
+            {
+                sb.AppendLine("o entity_" + entity.Id);
+
+                foreach (var vert in entity.VertexPositions)
+                {
+                    if (!verts.Contains(vert))
+                    {
+                        verts.Add(vert);
+                        sb.Append("v ").Append(Math.Round(vert.X, 6)).Append(" ").Append(Math.Round(vert.Y, 6)).Append(" ").Append(Math.Round(vert.Z, 6)).AppendLine();
+                    }
+                }
+
+                foreach (var vert in entity.VertexData)
+                {
+                    if (!norms.Contains(vert.Normal))
+                    {
+                        norms.Add(vert.Normal);
+                        sb.Append("vn ").Append(Math.Round(vert.Normal.X, 6)).Append(" ").Append(Math.Round(vert.Normal.Y, 6)).Append(" ").Append(Math.Round(vert.Normal.Z, 6)).AppendLine();
+                    }
+                }
+
+                for (int i = 0; i < entity.VertexData.Length; i += 3)
+                {
+                    sb.Append("f ");
+                    sb.Append(verts.IndexOf(entity.VertexData[i].Position) + 1).Append("//").Append(norms.IndexOf(entity.VertexData[i].Normal) + 1).Append(" ");
+                    sb.Append(verts.IndexOf(entity.VertexData[i + 1].Position) + 1).Append("//").Append(norms.IndexOf(entity.VertexData[i + 1].Normal) + 1).Append(" ");
+                    sb.Append(verts.IndexOf(entity.VertexData[i + 2].Position) + 1).Append("//").Append(norms.IndexOf(entity.VertexData[i + 2].Normal) + 1).AppendLine();
+                }
+            }
+            File.WriteAllText(fileName, sb.ToString(), Encoding.ASCII);
+
+            System.Threading.Thread.CurrentThread.CurrentCulture = backupCulture;
+        }
+
 
         public void SetNumericUpDowns(Microsoft.Xna.Framework.Vector3 value)
         {
@@ -378,6 +456,6 @@ namespace Diplom
             isDrag = false;
         }
 
-
+        
     }
 }

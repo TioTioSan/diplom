@@ -17,5 +17,15 @@ namespace Diplom
             }
             return result;
         }
+
+        public static int IndexOf(this Vector3[] source, Vector3 selector)
+        {
+            for (int i = 0; i < source.Length; i++)
+            {
+                if (selector == source[i])
+                    return i;
+            }
+            return -1;
+        }
     }
 }

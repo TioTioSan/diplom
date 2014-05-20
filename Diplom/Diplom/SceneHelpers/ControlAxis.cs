@@ -189,6 +189,7 @@ namespace Diplom.SceneHelpers
             set
             {
                 _isEnabled = value;
+                Engine.MainForm.IsEnabledBntLookAtSelection = value;
                 if (!_isEnabled)
                     Position = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
             }

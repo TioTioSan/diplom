@@ -8,7 +8,7 @@ namespace Diplom
 {
     public class Camera
     {
-        Vector3 _position, target, _up;
+        Vector3 _position, _target, _up;
         float aspectRatio, nearClip, farClip;
         float rotationSpeed, translationSpeed, zoomSpeed;
         Matrix worldMatrix, viewMatrix, projectionMatrix;
@@ -43,7 +43,7 @@ namespace Diplom
 
             this.aspectRatio = aspectRatio;
             this._position = position;
-            this.target = target;
+            this._target = target;
 
             worldMatrix = Matrix.Identity;
             viewMatrix = Matrix.CreateLookAt(position, target, _up);
@@ -52,23 +52,40 @@ namespace Diplom
 
         public void RotateAroundTarget(float deltaX, float deltaY)
         {
-            Vector3 right = Vector3.Normalize(Vector3.Cross(Vector3.Normalize(_position - target), _up));
+            Vector3 right = Vector3.Normalize(Vector3.Cross(Vector3.Normalize(_position - _target), _up));
             Quaternion qRotate = Quaternion.CreateFromAxisAngle(right, deltaY * rotationSpeed) * 
                                  Quaternion.CreateFromAxisAngle(_up, -deltaX * rotationSpeed);
-            _position = Vector3.Transform(_position - target, qRotate) + target;
+            _position = Vector3.Transform(_position - _target, qRotate) + _target;
 
-            Vector3 newRight = Vector3.Normalize(Vector3.Cross(Vector3.Normalize(_position - target), _up));
+            Vector3 newRight = Vector3.Normalize(Vector3.Cross(Vector3.Normalize(_position - _target), _up));
             if (Vector3.Dot(right, newRight) <= -0.94f) _up *= -1;
 
-            viewMatrix = Matrix.CreateLookAt(_position, target, _up);
+            viewMatrix = Matrix.CreateLookAt(_position, _target, _up);
         }
 
         public void MoveToTarget(float dist)
         {
-            Vector3 direction = dist < 0 ? _position - target : target - _position;
+            Vector3 direction = dist < 0 ? _position - _target : _target - _position;
             Matrix translationMatrix = Matrix.CreateTranslation(direction * zoomSpeed);
-            _position = Vector3.Transform(_position - target, translationMatrix);
-            viewMatrix = Matrix.CreateLookAt(_position, target, _up);
+            _position = Vector3.Transform(_position, translationMatrix);
+            viewMatrix = Matrix.CreateLookAt(_position, _target, _up);
+        }
+
+        public void Move(int deltaX, int deltaY)
+        {
+            Vector3 right = Vector3.Normalize(Vector3.Cross(Vector3.Normalize(_position - _target), _up));
+            Vector3 up = Vector3.Normalize(Vector3.Cross(right, Vector3.Normalize(_position - _target)));
+            Matrix translationMatrix = Matrix.CreateTranslation(right * translationSpeed * deltaX) *
+                                       Matrix.CreateTranslation(up * translationSpeed * deltaY);
+            _position = Vector3.Transform(_position, translationMatrix);
+            _target = Vector3.Transform(_target, translationMatrix);
+            viewMatrix = Matrix.CreateLookAt(_position, _target, _up);
+        }
+
+        public void LookAtSelection()
+        {
+            _target = Engine.ActiveControlAxis.Position;
+            viewMatrix = Matrix.CreateLookAt(_position, _target, _up);
         }
     }
 }
