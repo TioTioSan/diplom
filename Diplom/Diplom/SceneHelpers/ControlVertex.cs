@@ -5,21 +5,32 @@ using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Diplom.Primitives;
+using System.Runtime.Serialization;
 
 namespace Diplom.SceneHelpers
 {
+    [Serializable]
     public class ControlVertex
     {
+        [NonSerialized]
         private BasicEffect _effect;
+
+        [NonSerialized]
         private Matrix _vertexWorld = Matrix.Identity;
+        public Matrix VertexWorld { get { return _vertexWorld; } }
+
+        [NonSerialized]
         private BoundingBox _boundingBox;
+        public BoundingBox BoundingBox { get { return _boundingBox; } }
+
+        [NonSerialized]
         private Color _usualColor = Color.Blue;
+        [NonSerialized]
         private Color _highlightColor = Color.Red;
 
         public Vector3 Position { get; set; }
+
         public bool IsSelected { get { return Engine.VertexSelectionPool.Contains(this); } }
-        public BoundingBox BoundingBox { get { return _boundingBox; } }
-        public Matrix VertexWorld { get { return _vertexWorld; } }
 
         private ControlVertex()
         {
@@ -33,6 +44,16 @@ namespace Diplom.SceneHelpers
             : this()
         {
             Position = position;
+        }
+
+        [OnDeserialized]
+        void OnDeserialized(StreamingContext c)
+        {
+            _vertexWorld = Matrix.Identity;
+            _usualColor = Color.Blue;
+            _highlightColor = Color.Red;
+            _effect = new BasicEffect(Engine.ActiveGraphicsDevice) { VertexColorEnabled = true };
+            _boundingBox = Utils.CalculateBoundingBox(Utils.VerticesOfControlVertex);
         }
 
         public void Translate(Vector3 delta)

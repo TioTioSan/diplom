@@ -1,12 +1,3 @@
-#region File Description
-//-----------------------------------------------------------------------------
-// MainForm.cs
-//
-// Microsoft XNA Community Game Platform
-// Copyright (C) Microsoft Corporation. All rights reserved.
-//-----------------------------------------------------------------------------
-#endregion
-
 #region Using Statements
 using System;
 using System.IO;
@@ -17,6 +8,9 @@ using Microsoft.Xna.Framework.Graphics;
 using System.Drawing;
 using Diplom.Primitives;
 using Diplom.SceneHelpers;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Collections.Generic;
+using Diplom.Forms;
 #endregion
 
 namespace Diplom
@@ -63,6 +57,14 @@ namespace Diplom
             modelViewerControl.AddNewSceneEntity();
         }
 
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (Engine.IsChangesUnsaved)
+                if (!ShowUnsaveChangesDialog())
+                    e.Cancel = true;
+        }
+
+        #region Menu clicks
         private void ExitMenuClicked(object sender, EventArgs e)
         {
             Close();
@@ -70,27 +72,68 @@ namespace Diplom
 
         private void OpenMenuClicked(object sender, EventArgs e)
         {
-            OpenFileDialog fileDialog = new OpenFileDialog();
+            OpenFileDialog ofd = new OpenFileDialog();
 
-            // Default to the directory which contains our content files.
             string assemblyLocation = Assembly.GetExecutingAssembly().Location;
-            string relativePath = Path.Combine(assemblyLocation, "../../../../Content");
-            string contentPath = Path.GetFullPath(relativePath);
+            string relativePath = Path.Combine(assemblyLocation, "../Scenes");
+            string scenesPath = Path.GetFullPath(relativePath);
 
-            fileDialog.InitialDirectory = contentPath;
+            ofd.InitialDirectory = scenesPath;
+            ofd.Title = "Open scene";
+            ofd.Filter = "Diplom Files (*.d)|*.d;";
 
-            fileDialog.Title = "Load Model";
-
-            fileDialog.Filter = "Model Files (*.fbx;*.x)|*.fbx;*.x|" +
-                                "FBX Files (*.fbx)|*.fbx|" +
-                                "X Files (*.x)|*.x|" +
-                                "All Files (*.*)|*.*";
-
-            if (fileDialog.ShowDialog() == DialogResult.OK)
+            if (ofd.ShowDialog() == DialogResult.OK)
             {
+                if (Engine.IsChangesUnsaved)
+                    if (!ShowUnsaveChangesDialog())
+                        return;
 
+                Engine.Reset();
+                Engine.AssociatedFile = ofd.FileName;
+                LoadScene();
             }
         }
+
+        private void SaveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!Engine.IsChangesUnsaved) return;
+            if (Engine.AssociatedFile == "")
+                SaveAsToolStripMenuItem_Click(this, new EventArgs());
+            else
+                SaveScene();
+        }
+
+        private void SaveAsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog sfd = new SaveFileDialog();
+
+            string assemblyLocation = Assembly.GetExecutingAssembly().Location;
+            string relativePath = Path.Combine(assemblyLocation, "../Scenes");
+            string scenesPath = Path.GetFullPath(relativePath);
+
+            sfd.InitialDirectory = scenesPath;
+            sfd.FileName = "DiplomScene1.d";
+            sfd.Title = "Save scene";
+            sfd.Filter = "Diplom Files (*.d)|*.d;";
+
+            if (sfd.ShowDialog() == DialogResult.OK)
+            {
+                Engine.AssociatedFile = sfd.FileName;
+                SaveScene();
+            }
+        }
+
+        private void NewToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (Engine.IsChangesUnsaved)
+                if (!ShowUnsaveChangesDialog())
+                    return;
+
+            Engine.Reset();
+            Engine.AssociatedFile = "";
+            Engine.IsChangesUnsaved = false;
+        }
+        #endregion
 
         #region Mouse events
         private void modelViewerControl_MouseDown(object sender, MouseEventArgs e)
@@ -210,7 +253,6 @@ namespace Diplom
             e.Handled = true;
         }
 
-
         private void comboBoxes_SelectedIndexChanged(object sender, EventArgs e)
         {
             ComboBox cmbSender = sender as ComboBox;
@@ -250,6 +292,7 @@ namespace Diplom
                     break;
             }
 
+            Engine.StartAction(ActionType.VertexData);
             switch (Engine.ActiveTransformMode)
             {
                 case TransformationMode.Translate:
@@ -267,7 +310,55 @@ namespace Diplom
                     ResetNumericUpDowns();
                     break;
             }
+            Engine.EndAction();
         }
+
+
+        private bool ShowUnsaveChangesDialog()
+        {
+            switch (MessageBox.Show("Do you want to save changes?", "Diplom", MessageBoxButtons.YesNoCancel))
+            {
+                case DialogResult.Cancel:
+                    return false;
+                case DialogResult.No:
+                    return true;
+                case DialogResult.Yes:
+                    SaveToolStripMenuItem_Click(this, new EventArgs());
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        private void SaveScene()
+        {
+            Stream stream = File.Open(Engine.AssociatedFile, FileMode.Create);
+            BinaryFormatter bFormatter = new BinaryFormatter();
+            bFormatter.Serialize(stream, Engine.SceneEntities);
+            stream.Close();
+
+            Engine.IsChangesUnsaved = false;
+        }
+
+        private void LoadScene()
+        {
+            Cursor.Current = Cursors.WaitCursor;
+            using (PleaseWaitForm pwf = new PleaseWaitForm())
+            {
+                pwf.Location = new Point(this.Location.X + this.Width / 2 - pwf.Width / 2,
+                                        this.Location.Y + this.Height / 2 - pwf.Height / 2);
+                pwf.Show();
+                pwf.Update();
+
+                Stream stream = File.Open(Engine.AssociatedFile, FileMode.Open);
+                BinaryFormatter bFormatter = new BinaryFormatter();
+                Engine.SceneEntities = (List<SceneEntity>)bFormatter.Deserialize(stream);
+                stream.Close();
+                Engine.IsChangesUnsaved = false;
+            }
+            Cursor.Current = Cursors.Default;
+        }
+
 
         public void SetNumericUpDowns(Microsoft.Xna.Framework.Vector3 value)
         {
@@ -286,5 +377,7 @@ namespace Diplom
             nudZ.Value = 0;
             isDrag = false;
         }
+
+
     }
 }

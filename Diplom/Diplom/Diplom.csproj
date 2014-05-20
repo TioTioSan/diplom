@@ -68,6 +68,7 @@
     <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
     <Reference Include="Microsoft.Xna.Framework.Graphics, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
     <Reference Include="System" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.XML" />
@@ -76,6 +77,12 @@
     <Compile Include="Camera.cs" />
     <Compile Include="ContentBuilder.cs" />
     <Compile Include="ContentLoader.cs" />
+    <Compile Include="Forms\PleaseWaitForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\PleaseWaitForm.Designer.cs">
+      <DependentUpon>PleaseWaitForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="SceneEntityData.cs" />
     <Compile Include="Extentions.cs" />
     <Compile Include="SceneState.cs" />
@@ -109,6 +116,9 @@
     <Compile Include="SceneHelpers\Selector.cs" />
     <Compile Include="SceneHelpers\Transformer.cs" />
     <Compile Include="Utils.cs" />
+    <EmbeddedResource Include="Forms\PleaseWaitForm.resx">
+      <DependentUpon>PleaseWaitForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <SubType>Designer</SubType>
       <DependentUpon>MainForm.cs</DependentUpon>

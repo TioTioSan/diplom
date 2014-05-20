@@ -5,14 +5,20 @@ using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Diplom.Primitives;
+using System.Runtime.Serialization;
 
 namespace Diplom.SceneHelpers
 {
+    [Serializable]
     public class ControlTriangle
     {
+        [NonSerialized]
         private BasicEffect _effect;
+        [NonSerialized]
         private Matrix _vertexWorld = Matrix.Identity;
+        [NonSerialized]
         private Color _usualColor = new Color(0, 0, 150, 150);
+        [NonSerialized]
         private Color _highlightColor = new Color(100, 0, 0, 100);
 
         private VertexPositionColor[] _vertexData;
@@ -58,6 +64,15 @@ namespace Diplom.SceneHelpers
             _vertexData[0] = new VertexPositionColor(FirstVertex, Color.White);
             _vertexData[1] = new VertexPositionColor(SecondVertex, Color.White);
             _vertexData[2] = new VertexPositionColor(ThirdVertex, Color.White);
+        }
+
+        [OnDeserialized]
+        void OnDeserialized(StreamingContext c)
+        {
+            _vertexWorld = Matrix.Identity;
+            _usualColor = new Color(0, 0, 150, 150);
+            _highlightColor = new Color(100, 0, 0, 100);
+            _effect = new BasicEffect(Engine.ActiveGraphicsDevice) { VertexColorEnabled = true };
         }
 
         public void Translate(Vector3 delta)

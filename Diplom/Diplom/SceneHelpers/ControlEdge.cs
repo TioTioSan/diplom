@@ -5,15 +5,22 @@ using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Diplom.Primitives;
+using System.Runtime.Serialization;
 
 namespace Diplom.SceneHelpers
 {
+    [Serializable]
     public class ControlEdge
     {
+        [NonSerialized]
         private BasicEffect _effect;
+        [NonSerialized]
         private Matrix _vertexWorld = Matrix.Identity;
+        [NonSerialized]
         private Color _usualColor = Color.Blue;
+        [NonSerialized]
         private Color _highlightColor = Color.Red;
+        [NonSerialized]
         private Color _wireModeColor = new Color(10, 10, 10);
 
         private VertexPositionColor[] _vertexData;
@@ -51,6 +58,16 @@ namespace Diplom.SceneHelpers
 
             _vertexData[0] = new VertexPositionColor(FirstVertex, Color.White);
             _vertexData[1] = new VertexPositionColor(SecondVertex, Color.White);
+        }
+
+        [OnDeserialized]
+        void OnDeserialized(StreamingContext c)
+        {
+            _vertexWorld = Matrix.Identity;
+            _usualColor = Color.Blue;
+            _highlightColor = Color.Red;
+            _wireModeColor = new Color(10, 10, 10);
+            _effect = new BasicEffect(Engine.ActiveGraphicsDevice) { VertexColorEnabled = true };
         }
 
         public void Translate(Vector3 delta)

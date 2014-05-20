@@ -13,6 +13,9 @@ namespace Diplom
 {
     public static class Engine
     {
+        public static string AssociatedFile = "";
+        public static bool IsChangesUnsaved = false;
+
         public static SceneState StartSceneState;
         private static List<SceneState> UndoStack = new List<SceneState>();
         private static List<SceneState> RedoStack = new List<SceneState>();
@@ -100,14 +103,15 @@ namespace Diplom
                         ActiveControlAxis.IsEnabled = true;
                         ActiveControlAxis.Position = EntitySelectionPool[0].Center;
 
-                        CleanSelectionPools(new List<SceneEntity>() { EntitySelectionPool[0] });
+                        CleanSelectionPools();
                     }
                     else if (EntitySelectionPool.Count > 1)
                     {
                         Engine.MainForm.IsEnabledSubObjCmbBox = true;
                         ActiveControlAxis.IsEnabled = true;
                         ActiveControlAxis.Position = Utils.GetCenter(EntitySelectionPool);
-                        CleanSelectionPools(EntitySelectionPool);
+
+                        CleanSelectionPools();
                     }
                     else
                     {
@@ -170,27 +174,22 @@ namespace Diplom
             }
         }
 
-        public static void ResetAxisPos()
+        public static void Reset()
         {
-            switch (ActiveSubObjectMode)
-            {
-                case SubObjectMode.None:
-                    if (EntitySelectionPool.Count > 0)
-                        ActiveControlAxis.Position = Utils.GetCenter(EntitySelectionPool);
-                    break;
-                case SubObjectMode.Vertex:
-                    if (VertexSelectionPool.Count > 0)
-                        ActiveControlAxis.Position = Utils.GetCenter(VertexSelectionPool);
-                    break;
-                case SubObjectMode.Edge:
-                    if (EdgeSelectionPool.Count > 0)
-                        ActiveControlAxis.Position = Utils.GetCenter(EdgeSelectionPool);
-                    break;
-                case SubObjectMode.Triangle:
-                    if (TriangleSelectionPool.Count > 0)
-                        ActiveControlAxis.Position = Utils.GetCenter(TriangleSelectionPool);
-                    break;
-            }
+            ActiveTransformMode = TransformationMode.Translate;
+            ActiveSubObjectMode = SubObjectMode.None;
+
+            SceneEntities = new List<SceneEntity>();
+
+            EntitySelectionPool = new List<SceneEntity>();
+            VertexSelectionPool = new List<ControlVertex>();
+            EdgeSelectionPool = new List<ControlEdge>();
+            TriangleSelectionPool = new List<ControlTriangle>();
+
+            UndoStack = new List<SceneState>();
+            RedoStack = new List<SceneState>();
+
+            SelectionChanged();
         }
 
         public static void StartAction(ActionType actionType)
@@ -205,13 +204,12 @@ namespace Diplom
                 return;
             }
 
-            if (RedoStack.Count != 0)
-                RedoStack.Clear();
-
+            if (RedoStack.Count != 0) RedoStack.Clear();
             UndoStack.Add(StartSceneState);
+            if (UndoStack.Count > UndoCount) UndoStack.RemoveAt(0);
 
-            if (UndoStack.Count > UndoCount)
-                UndoStack.RemoveAt(0);
+            if (StartSceneState.ActionType == ActionType.VertexData)
+                IsChangesUnsaved = true;
 
             StartSceneState = null;
         }
@@ -234,23 +232,11 @@ namespace Diplom
             }
         }
 
-        private static void CleanSelectionPools(List<SceneEntity> entities)
+        private static void CleanSelectionPools()
         {
-            VertexSelectionPool.ForEach(x =>
-            {
-                if (!entities.Any(y => y.ControlVertices.Contains(x)))
-                    VertexSelectionPool.Remove(x);
-            });
-            EdgeSelectionPool.ForEach(x =>
-            {
-                if (!entities.Any(y => y.ControlEdges.Contains(x)))
-                    EdgeSelectionPool.Remove(x);
-            });
-            TriangleSelectionPool.ForEach(x =>
-            {
-                if (!entities.Any(y => y.ControlTriangles.Contains(x)))
-                    TriangleSelectionPool.Remove(x);
-            });
+            VertexSelectionPool.RemoveAll(x => !EntitySelectionPool.Any(y => y.ControlVertices.Any(z => z.Position == x.Position)));
+            EdgeSelectionPool.RemoveAll(x => !EntitySelectionPool.Any(y => y.ControlEdges.Any(z => z.FirstVertex == x.FirstVertex && z.SecondVertex == x.SecondVertex)));
+            TriangleSelectionPool.RemoveAll(x => !EntitySelectionPool.Any(y => y.ControlTriangles.Any(z => z.FirstVertex == x.FirstVertex && z.SecondVertex == x.SecondVertex && z.ThirdVertex == x.ThirdVertex)));
         }
     }
 }

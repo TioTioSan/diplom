@@ -6,24 +6,24 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Diplom.Primitives;
 using Diplom.SceneHelpers;
+using System.Runtime.Serialization;
 
 namespace Diplom
 {
+    [Serializable]
     public class SceneEntity
     {
         #region Fields & Properties
-        const float LENGTH = 5f;
-
         private int _id;
         public int Id { get { return _id; } }
 
+        [NonSerialized]
         private BasicEffect _basicEffect;
-        private GraphicsDevice _graphicsDevice;
 
+        [NonSerialized]
         private BasicEffect _selectionBoxEffect;
+        [NonSerialized]
         private List<VertexPositionColor> _selectionBoxVertices = new List<VertexPositionColor>();
-
-        public string Name { get; set; }
 
         private Vector3 _position = Vector3.Zero;
         public Vector3 Position
@@ -32,6 +32,7 @@ namespace Diplom
             set { _position = value; }
         }
 
+        [NonSerialized]
         private BoundingBox _boundingBox;
         public BoundingBox BoundingBox
         {
@@ -44,10 +45,13 @@ namespace Diplom
 
         private Vector3[] _vertexPositions;
         public Vector3[] VertexPositions { get { return _vertexPositions; } }
+
         private VertexPositionNormalTexture[] _vertexData;
         public VertexPositionNormalTexture[] VertexData { get { return _vertexData; } }
+
         private PrimitiveType _primitiveType;
         public PrimitiveType PrimitiveType { get { return _primitiveType; } }
+
         private int _primitiveCount;
         public int PrimitiveCount { get { return _primitiveCount; } }
 
@@ -69,7 +73,6 @@ namespace Diplom
             _basicEffect.EnableDefaultLighting();
 
             _selectionBoxEffect = new BasicEffect(Engine.ActiveGraphicsDevice) { VertexColorEnabled = true };
-            _graphicsDevice = Engine.ActiveGraphicsDevice;
 
             _vertexData = primitive.VertexData;
             _vertexPositions = primitive.VertexPositions;
@@ -98,6 +101,16 @@ namespace Diplom
             RecalcBoundingBox();
         }
 
+        [OnDeserialized]
+        void OnDeserialized(StreamingContext c)
+        {
+            _basicEffect = new BasicEffect(Engine.ActiveGraphicsDevice);
+            _basicEffect.EnableDefaultLighting();
+            _selectionBoxEffect = new BasicEffect(Engine.ActiveGraphicsDevice) { VertexColorEnabled = true };
+            _selectionBoxVertices = new List<VertexPositionColor>();
+            RecalcBoundingBox();
+        }
+
         public float? Select(Ray selectionRay)
         {
             return selectionRay.Intersects(_boundingBox);
@@ -105,8 +118,8 @@ namespace Diplom
 
         public void Draw(Camera camera)
         {
-            _graphicsDevice.DepthStencilState = DepthStencilState.Default;
-            _graphicsDevice.RasterizerState = RasterizerState.CullNone;
+            Engine.ActiveGraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            Engine.ActiveGraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
             _basicEffect.World = camera.WorldMatrix;
             _basicEffect.View = camera.ViewMatrix;
@@ -117,7 +130,7 @@ namespace Diplom
             _basicEffect.CurrentTechnique.Passes[0].Apply();
 
             if (_primitiveCount > 0)
-                _graphicsDevice.DrawUserPrimitives(_primitiveType, _vertexData, 0, _primitiveCount);
+                Engine.ActiveGraphicsDevice.DrawUserPrimitives(_primitiveType, _vertexData, 0, _primitiveCount);
 
             if (Engine.EntitySelectionPool.Contains(this))
             {

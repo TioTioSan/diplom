@@ -205,7 +205,7 @@ namespace Diplom
         {
             if (trianData.Count > contrTrian.Count)
             {
-                for (int i = 0; i < trianData.Count; i += 3)
+                for (int i = 0; i < trianData.Count; i++)
                 {
                     if (i == contrTrian.Count || !(contrTrian[i].FirstVertex == trianData[i].FirstVertex && contrTrian[i].SecondVertex == trianData[i].SecondVertex && contrTrian[i].ThirdVertex == trianData[i].ThirdVertex))
                     {
@@ -217,7 +217,7 @@ namespace Diplom
             }
             else
             {
-                for (int i = 0; i < contrTrian.Count; i += 3)
+                for (int i = 0; i < contrTrian.Count; i++)
                 {
                     if (i == trianData.Count || !(contrTrian[i].FirstVertex == trianData[i].FirstVertex && contrTrian[i].SecondVertex == trianData[i].SecondVertex && contrTrian[i].ThirdVertex == trianData[i].ThirdVertex))
                     {
