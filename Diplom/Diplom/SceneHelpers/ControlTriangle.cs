@@ -121,5 +121,10 @@ namespace Diplom.SceneHelpers
             return (FirstVertex == edge.FirstVertex || SecondVertex == edge.FirstVertex || ThirdVertex == edge.FirstVertex) &&
                    (FirstVertex == edge.SecondVertex || SecondVertex == edge.SecondVertex || ThirdVertex == edge.SecondVertex);
         }
+
+        public bool Contains(ControlEdge edge1, ControlEdge edge2, ControlEdge edge3)
+        {
+            return Contains(edge1) && Contains(edge2) && Contains(edge3);
+        }
     }
 }

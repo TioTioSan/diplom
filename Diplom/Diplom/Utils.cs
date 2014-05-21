@@ -229,6 +229,39 @@ namespace Diplom
                 }
             }
         }
+
+        public static bool IsMakeEdgeAllowed()
+        {
+            if (Engine.VertexSelectionPool.Count != 2) return false;
+            foreach (var entity in Engine.EntitySelectionPool)
+            {
+                if (entity.ControlEdges.Any(x => x.Contains(Engine.VertexSelectionPool[0] , Engine.VertexSelectionPool[1])))
+                    return false;
+            }
+            return true;
+        }
+
+        public static bool IsMakeTriangleAllowed()
+        {
+            if (Engine.EdgeSelectionPool.Count != 3) return false;
+
+            List<Vector3> verts = new List<Vector3>();
+            foreach (var edge in Engine.EdgeSelectionPool)
+            {
+                if (!verts.Contains(edge.FirstVertex))
+                    verts.Add(edge.FirstVertex);
+                if (!verts.Contains(edge.SecondVertex))
+                    verts.Add(edge.SecondVertex);
+            }
+            if (verts.Count != 3) return false;
+
+            foreach (var entity in Engine.EntitySelectionPool)
+            {
+                if (entity.ControlTriangles.Any(x => x.Contains(Engine.EdgeSelectionPool[0] , Engine.EdgeSelectionPool[1], Engine.EdgeSelectionPool[1])))
+                    return false;
+            }
+            return true;
+        }
     }
 
     public struct Vert

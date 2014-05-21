@@ -43,6 +43,7 @@ namespace Diplom
         SubObjMode = 0,
         EntityCount = 1,
         Selection = 2,
-        VertexData = 3
+        VertexData = 3,
+        AttachMode = 4
     }
 }

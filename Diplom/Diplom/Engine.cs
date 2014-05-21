@@ -21,6 +21,9 @@ namespace Diplom
         private static List<SceneState> RedoStack = new List<SceneState>();
 
         public static int UndoCount = 50;
+        public static int EntityCount = 0;
+
+        public static bool IsInAttachMode = false;
 
         public static GraphicsDevice ActiveGraphicsDevice { get; set; }
         public static Camera ActiveCamera { get; set; }
@@ -94,6 +97,7 @@ namespace Diplom
 
         public static void SelectionChanged()
         {
+            MainForm.ChangeEditTool();
             switch (ActiveSubObjectMode)
             {
                 case SubObjectMode.None:

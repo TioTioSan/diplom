@@ -67,7 +67,7 @@ namespace Diplom
 
         public SceneEntity(PrimitiveBase primitive)
         {
-            _id = Engine.SceneEntities.Count;
+            _id = Engine.EntityCount++;
 
             _basicEffect = new BasicEffect(Engine.ActiveGraphicsDevice);
             _basicEffect.EnableDefaultLighting();
@@ -863,6 +863,27 @@ namespace Diplom
 
             RecalcBoundingBox();
             RecalcNormals();
+        }
+
+        public void Attach(SceneEntity entity)
+        {
+            _primitiveCount += entity.PrimitiveCount;
+
+            var vertData = _vertexData.ToList();
+            vertData.AddRange(entity.VertexData);
+            _vertexData = vertData.ToArray();
+
+            var posData = _vertexPositions.ToList();
+            posData.AddRange(entity.VertexPositions);
+            _vertexPositions = posData.ToArray();
+
+            ControlVertices.AddRange(entity.ControlVertices);
+            ControlEdges.AddRange(entity.ControlEdges);
+            ControlTriangles.AddRange(entity.ControlTriangles);
+
+            RecalcBoundingBox();
+            RecalcCenter();
+            Engine.ActiveControlAxis.Position = _center;
         }
 
         private void DrawConrtolVertices()

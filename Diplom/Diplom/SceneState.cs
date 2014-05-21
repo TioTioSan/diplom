@@ -50,6 +50,11 @@ namespace Diplom
                     SceneEntitiesData = new List<SceneEntityData>();
                     Engine.EntitySelectionPool.ForEach(x => SceneEntitiesData.Add(new SceneEntityData(x)));
                     break;
+                case ActionType.AttachMode:
+                    SceneEntities = new List<SceneEntity>(Engine.SceneEntities);
+                    SceneEntitiesData = new List<SceneEntityData>();
+                    Engine.EntitySelectionPool.ForEach(x => SceneEntitiesData.Add(new SceneEntityData(x)));
+                    break;
             }
         }
 
@@ -96,6 +101,15 @@ namespace Diplom
                         if (data.Different(entity)) return true;
                     }
                     break;
+                case ActionType.AttachMode:
+                    if (SceneEntities.Count != Engine.SceneEntities.Count) return true;
+                    foreach (var data in SceneEntitiesData)
+                    {
+                        SceneEntity entity = Engine.EntitySelectionPool.FirstOrDefault(x => x.Id == data.Id);
+                        if (entity == null) return true;
+                        if (data.Different(entity)) return true;
+                    }
+                    break;
             }
 
             return false;
@@ -135,6 +149,11 @@ namespace Diplom
                     Engine.SelectionChanged();
                     break;
                 case ActionType.VertexData:
+                    SceneEntitiesData.ForEach(x => Engine.EntitySelectionPool.FirstOrDefault(y => y.Id == x.Id).RestoreData(x));
+                    Engine.SelectionChanged();
+                    break;
+                case ActionType.AttachMode:
+                    Engine.SceneEntities = SceneEntities;
                     SceneEntitiesData.ForEach(x => Engine.EntitySelectionPool.FirstOrDefault(y => y.Id == x.Id).RestoreData(x));
                     Engine.SelectionChanged();
                     break;

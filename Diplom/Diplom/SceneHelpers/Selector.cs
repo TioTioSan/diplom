@@ -38,6 +38,22 @@ namespace Diplom.SceneHelpers
             bool isObjPicked = obj != null;
             bool isAlreadySelected = isObjPicked && Engine.EntitySelectionPool.Contains(obj);
 
+            if (Engine.IsInAttachMode)
+            {
+                if (!isObjPicked || isAlreadySelected)
+                {
+                    Engine.IsInAttachMode = false;
+                    return;
+                }
+                Engine.StartAction(ActionType.AttachMode);
+                Engine.EntitySelectionPool[0].Attach(obj);
+                Engine.SceneEntities.Remove(obj);
+                Engine.EndAction();
+
+                Engine.IsInAttachMode = false;
+                return;
+            }
+
             switch (Control.ModifierKeys)
             {
                 case Keys.Control:

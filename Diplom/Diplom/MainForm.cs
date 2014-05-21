@@ -21,6 +21,27 @@ namespace Diplom
         private Point mouseOldPos = new Point();
         private bool isDrag = false;
 
+        public bool IsEnabledAttachTool
+        {
+            get { return AttachToolStripMenuItem.Enabled; }
+            set { AttachToolStripMenuItem.Enabled = value; }
+        }
+        public bool IsEnabledMakeVertex
+        {
+            get { return MakeVertexToolStripMenuItem.Enabled; }
+            set { MakeVertexToolStripMenuItem.Enabled = value; }
+        }
+        public bool IsEnabledMakeEdge
+        {
+            get { return MakeEdgeToolStripMenuItem.Enabled; }
+            set { MakeEdgeToolStripMenuItem.Enabled = value; }
+        }
+        public bool IsEnabledMakeTriangle
+        {
+            get { return MakeTriangleToolStripMenuItem.Enabled; }
+            set { MakeTriangleToolStripMenuItem.Enabled = value; }
+        }
+
         public bool IsEnabledSubObjCmbBox
         {
             get { return cmbSubObject.Enabled; }
@@ -38,6 +59,7 @@ namespace Diplom
             get { return cmbSubObject.SelectedIndex; }
             set { cmbSubObject.SelectedIndex = value; }
         }
+
 
         public MainForm()
         {
@@ -158,6 +180,27 @@ namespace Diplom
             {
                 ExportScene(sfd.FileName);
             }
+        }
+
+
+        private void AttachToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Engine.IsInAttachMode = true;
+        }
+
+        private void MakeVertexToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void MakeEdgeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void MakeTriangleToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
         }
         #endregion
 
@@ -291,6 +334,7 @@ namespace Diplom
             {
                 case "cmbSubObject":
                     Engine.ActiveSubObjectMode = (SubObjectMode)cmbSender.SelectedIndex;
+                    ChangeEditTool();
                     break;
                 case "cmbTransform":
                     Engine.ActiveTransformMode = (TransformationMode)cmbSender.SelectedIndex;
@@ -438,6 +482,28 @@ namespace Diplom
         }
 
 
+        public void ChangeEditTool()
+        {
+            IsEnabledAttachTool = false;
+            IsEnabledMakeVertex = false;
+            IsEnabledMakeEdge = false;
+            IsEnabledMakeTriangle = false;
+            if (Engine.EntitySelectionPool.Count != 1) return;
+            switch (Engine.ActiveSubObjectMode)
+            {
+                case SubObjectMode.None:
+                    IsEnabledAttachTool = true;
+                    break;
+                case SubObjectMode.Vertex:
+                    IsEnabledMakeVertex = true;
+                    IsEnabledMakeEdge = Utils.IsMakeEdgeAllowed();
+                    break;
+                case SubObjectMode.Edge:
+                    IsEnabledMakeTriangle = Utils.IsMakeTriangleAllowed();
+                    break;
+            }
+        }
+
         public void SetNumericUpDowns(Microsoft.Xna.Framework.Vector3 value)
         {
             isDrag = true;
@@ -456,6 +522,5 @@ namespace Diplom
             isDrag = false;
         }
 
-        
     }
 }

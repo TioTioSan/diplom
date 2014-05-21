@@ -72,9 +72,12 @@ namespace Diplom
 
         public void AddNewSceneEntity()
         {
-            Engine.StartAction(ActionType.EntityCount);
-            Engine.SceneEntities.Add(new SceneEntity(new Cube()));
-            Engine.EndAction();
+            if (Engine.StartSceneState == null)
+            {
+                Engine.StartAction(ActionType.EntityCount);
+                Engine.SceneEntities.Add(new SceneEntity(new Cube()));
+                Engine.EndAction();
+            }
         }
 
         public void MyLeftMouseDown(int x, int y)
@@ -250,23 +253,34 @@ namespace Diplom
 
         private void MyMouseClick(int x, int y)
         {
-            Engine.StartAction(ActionType.Selection);
             switch (Engine.ActiveSubObjectMode)
             {
                 case SubObjectMode.None:
-                    Selector.PickSceneEntity();
+                    if (!Engine.IsInAttachMode)
+                    {
+                        Engine.StartAction(ActionType.Selection);
+                        Selector.PickSceneEntity();
+                        Engine.EndAction();
+                    }
+                    else
+                        Selector.PickSceneEntity();
                     break;
                 case SubObjectMode.Vertex:
+                    Engine.StartAction(ActionType.Selection);
                     Selector.PickControlVertex();
+                    Engine.EndAction();
                     break;
                 case SubObjectMode.Edge:
+                    Engine.StartAction(ActionType.Selection);
                     Selector.PickControlEdge();
+                    Engine.EndAction();
                     break;
                 case SubObjectMode.Triangle:
+                    Engine.StartAction(ActionType.Selection);
                     Selector.PickControlTriangle();
+                    Engine.EndAction();
                     break;
             }
-            Engine.EndAction();
         }
 
         private void DrawSelectionRect()

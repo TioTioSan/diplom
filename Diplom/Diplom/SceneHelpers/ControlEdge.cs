@@ -129,5 +129,11 @@ namespace Diplom.SceneHelpers
 
             return intersectDist < 0.1f;
         }
+
+        public bool Contains(ControlVertex vert1, ControlVertex vert2)
+        {
+            return (FirstVertex == vert1.Position && SecondVertex == vert2.Position) ||
+                   (SecondVertex == vert2.Position && FirstVertex == vert1.Position);
+        }
     }
 }

@@ -58,6 +58,7 @@ namespace Diplom
             this.label3 = new System.Windows.Forms.Label();
             this.cmbDraw = new System.Windows.Forms.ComboBox();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.modelViewerControl = new Diplom.ModelViewerControl();
             this.nudX = new System.Windows.Forms.NumericUpDown();
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
@@ -65,7 +66,6 @@ namespace Diplom
             this.labelZ = new System.Windows.Forms.Label();
             this.nudZ = new System.Windows.Forms.NumericUpDown();
             this.btnLookAtSelection = new System.Windows.Forms.Button();
-            this.modelViewerControl = new Diplom.ModelViewerControl();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudX)).BeginInit();
@@ -176,9 +176,12 @@ namespace Diplom
             // 
             // AttachToolStripMenuItem
             // 
+            this.AttachToolStripMenuItem.Enabled = false;
             this.AttachToolStripMenuItem.Name = "AttachToolStripMenuItem";
+            this.AttachToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.A)));
             this.AttachToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
             this.AttachToolStripMenuItem.Text = "Attach";
+            this.AttachToolStripMenuItem.Click += new System.EventHandler(this.AttachToolStripMenuItem_Click);
             // 
             // toolStripSeparator4
             // 
@@ -187,24 +190,30 @@ namespace Diplom
             // 
             // MakeVertexToolStripMenuItem
             // 
+            this.MakeVertexToolStripMenuItem.Enabled = false;
             this.MakeVertexToolStripMenuItem.Name = "MakeVertexToolStripMenuItem";
             this.MakeVertexToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.V)));
             this.MakeVertexToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
             this.MakeVertexToolStripMenuItem.Text = "Make vertex";
+            this.MakeVertexToolStripMenuItem.Click += new System.EventHandler(this.MakeVertexToolStripMenuItem_Click);
             // 
             // MakeEdgeToolStripMenuItem
             // 
+            this.MakeEdgeToolStripMenuItem.Enabled = false;
             this.MakeEdgeToolStripMenuItem.Name = "MakeEdgeToolStripMenuItem";
             this.MakeEdgeToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.E)));
             this.MakeEdgeToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
             this.MakeEdgeToolStripMenuItem.Text = "Make edge";
+            this.MakeEdgeToolStripMenuItem.Click += new System.EventHandler(this.MakeEdgeToolStripMenuItem_Click);
             // 
             // MakeTriangleToolStripMenuItem
             // 
+            this.MakeTriangleToolStripMenuItem.Enabled = false;
             this.MakeTriangleToolStripMenuItem.Name = "MakeTriangleToolStripMenuItem";
             this.MakeTriangleToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.T)));
             this.MakeTriangleToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
             this.MakeTriangleToolStripMenuItem.Text = "Make triangle";
+            this.MakeTriangleToolStripMenuItem.Click += new System.EventHandler(this.MakeTriangleToolStripMenuItem_Click);
             // 
             // AddToolStripMenuItem
             // 
@@ -324,6 +333,19 @@ namespace Diplom
             this.panel1.Size = new System.Drawing.Size(768, 380);
             this.panel1.TabIndex = 4;
             // 
+            // modelViewerControl
+            // 
+            this.modelViewerControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.modelViewerControl.Location = new System.Drawing.Point(0, 0);
+            this.modelViewerControl.Name = "modelViewerControl";
+            this.modelViewerControl.Size = new System.Drawing.Size(764, 376);
+            this.modelViewerControl.TabIndex = 1;
+            this.modelViewerControl.Text = "modelViewerControl";
+            this.modelViewerControl.KeyDown += new System.Windows.Forms.KeyEventHandler(this.modelViewerControl_KeyDown);
+            this.modelViewerControl.MouseDown += new System.Windows.Forms.MouseEventHandler(this.modelViewerControl_MouseDown);
+            this.modelViewerControl.MouseMove += new System.Windows.Forms.MouseEventHandler(this.modelViewerControl_MouseMove);
+            this.modelViewerControl.MouseUp += new System.Windows.Forms.MouseEventHandler(this.modelViewerControl_MouseUp);
+            // 
             // nudX
             // 
             this.nudX.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -416,6 +438,7 @@ namespace Diplom
             // 
             // btnLookAtSelection
             // 
+            this.btnLookAtSelection.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnLookAtSelection.Enabled = false;
             this.btnLookAtSelection.Location = new System.Drawing.Point(668, 440);
             this.btnLookAtSelection.Name = "btnLookAtSelection";
@@ -424,19 +447,6 @@ namespace Diplom
             this.btnLookAtSelection.Text = "Look at selection";
             this.btnLookAtSelection.UseVisualStyleBackColor = true;
             this.btnLookAtSelection.Click += new System.EventHandler(this.btnCameraLookAt_Click);
-            // 
-            // modelViewerControl
-            // 
-            this.modelViewerControl.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.modelViewerControl.Location = new System.Drawing.Point(0, 0);
-            this.modelViewerControl.Name = "modelViewerControl";
-            this.modelViewerControl.Size = new System.Drawing.Size(764, 376);
-            this.modelViewerControl.TabIndex = 1;
-            this.modelViewerControl.Text = "modelViewerControl";
-            this.modelViewerControl.KeyDown += new System.Windows.Forms.KeyEventHandler(this.modelViewerControl_KeyDown);
-            this.modelViewerControl.MouseDown += new System.Windows.Forms.MouseEventHandler(this.modelViewerControl_MouseDown);
-            this.modelViewerControl.MouseMove += new System.Windows.Forms.MouseEventHandler(this.modelViewerControl_MouseMove);
-            this.modelViewerControl.MouseUp += new System.Windows.Forms.MouseEventHandler(this.modelViewerControl_MouseUp);
             // 
             // MainForm
             // 

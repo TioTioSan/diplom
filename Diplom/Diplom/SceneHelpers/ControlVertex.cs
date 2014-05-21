@@ -39,13 +39,11 @@ namespace Diplom.SceneHelpers
 
             _boundingBox = Utils.CalculateBoundingBox(Utils.VerticesOfControlVertex);
         }
-
         public ControlVertex(Vector3 position)
             : this()
         {
             Position = position;
         }
-
         [OnDeserialized]
         void OnDeserialized(StreamingContext c)
         {
@@ -92,6 +90,6 @@ namespace Diplom.SceneHelpers
             _effect.CurrentTechnique.Passes[0].Apply();
 
             Engine.ActiveGraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, Utils.VerticesOfControlVertex, 0, 12);
-        }
+        }               
     }
 }
