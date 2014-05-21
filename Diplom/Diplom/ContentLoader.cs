@@ -103,7 +103,7 @@ namespace Diplom
             if (_loadedFonts.ContainsKey(fontName))
                 return _loadedFonts[fontName];
 
-            _contentBuilder.Add(GetContentPath(fileName), fontName, null, null);
+            _contentBuilder.Add(GetContentPath(fileName), fontName, null, "FontDescriptionProcessor");
 
             string buildError = _contentBuilder.Build();
 

@@ -75,7 +75,7 @@ namespace Diplom
             Engine.MainForm = this;
 
             Engine.ContentLoader.LoadTexture("DottedLine.tga", "DottedLine");
-            //Engine.ContentLoader.LoadFont("DiplomFont.spritefont", "DiplomFont");
+            Engine.ContentLoader.LoadFont("DiplomFont.spritefont", "DiplomFont");
 
             modelViewerControl.Load();
 
@@ -140,6 +140,9 @@ namespace Diplom
             string relativePath = Path.Combine(assemblyLocation, "../Scenes");
             string scenesPath = Path.GetFullPath(relativePath);
 
+            if (!Directory.Exists(scenesPath))
+                Directory.CreateDirectory(scenesPath);
+
             sfd.InitialDirectory = scenesPath;
             sfd.FileName = "DiplomScene.d";
             sfd.Title = "Save scene";
@@ -169,9 +172,12 @@ namespace Diplom
 
             string assemblyLocation = Assembly.GetExecutingAssembly().Location;
             string relativePath = Path.Combine(assemblyLocation, "../Export");
-            string scenesPath = Path.GetFullPath(relativePath);
+            string exportsPath = Path.GetFullPath(relativePath);
 
-            sfd.InitialDirectory = scenesPath;
+            if (!Directory.Exists(exportsPath))
+                Directory.CreateDirectory(exportsPath);
+
+            sfd.InitialDirectory = exportsPath;
             sfd.FileName = "DiplomScene.obj";
             sfd.Title = "Export scene";
             sfd.Filter = "Object Files (*.obj)|*.obj;";

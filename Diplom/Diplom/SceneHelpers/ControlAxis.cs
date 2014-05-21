@@ -211,7 +211,7 @@ namespace Diplom.SceneHelpers
             _axisText[1] = "Y";
             _axisText[2] = "Z";
 
-            //_font = Engine.ContentLoader.GetLoadedFont("DiplomFont");
+            _font = Engine.ContentLoader.GetLoadedFont("DiplomFont");
 
             X_AxisDirection = Vector3.Right;
             Y_AxisDirection = Vector3.Up;
@@ -409,7 +409,7 @@ namespace Diplom.SceneHelpers
 
             Engine.ActiveGraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            //Draw2D();
+            Draw2D();
         }
 
         public void SubObjectModeChanged()
@@ -565,7 +565,7 @@ namespace Diplom.SceneHelpers
                 if (screenPos.Z < 0f || screenPos.Z > 1.0f)
                     continue;
 
-                Color color = _axisColors[i];
+                Color color = Color.Black;
                 switch (i)
                 {
                     case 0:

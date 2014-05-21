@@ -276,7 +276,7 @@ namespace Diplom
             this.cmbSubObject.Location = new System.Drawing.Point(79, 27);
             this.cmbSubObject.Name = "cmbSubObject";
             this.cmbSubObject.Size = new System.Drawing.Size(146, 21);
-            this.cmbSubObject.TabIndex = 3;
+            this.cmbSubObject.TabIndex = 1;
             this.cmbSubObject.SelectedIndexChanged += new System.EventHandler(this.comboBoxes_SelectedIndexChanged);
             // 
             // label2
@@ -299,7 +299,7 @@ namespace Diplom
             this.cmbTransform.Location = new System.Drawing.Point(294, 27);
             this.cmbTransform.Name = "cmbTransform";
             this.cmbTransform.Size = new System.Drawing.Size(121, 21);
-            this.cmbTransform.TabIndex = 3;
+            this.cmbTransform.TabIndex = 2;
             this.cmbTransform.SelectedIndexChanged += new System.EventHandler(this.comboBoxes_SelectedIndexChanged);
             // 
             // label3
@@ -354,7 +354,7 @@ namespace Diplom
             -2147483648});
             this.nudX.Name = "nudX";
             this.nudX.Size = new System.Drawing.Size(106, 20);
-            this.nudX.TabIndex = 5;
+            this.nudX.TabIndex = 4;
             this.nudX.ValueChanged += new System.EventHandler(this.numericUpDowns_ValueChanged);
             // 
             // label4
@@ -424,7 +424,7 @@ namespace Diplom
             -2147483648});
             this.nudZ.Name = "nudZ";
             this.nudZ.Size = new System.Drawing.Size(106, 20);
-            this.nudZ.TabIndex = 5;
+            this.nudZ.TabIndex = 6;
             this.nudZ.ValueChanged += new System.EventHandler(this.numericUpDowns_ValueChanged);
             // 
             // btnLookAtSelection
@@ -434,7 +434,7 @@ namespace Diplom
             this.btnLookAtSelection.Location = new System.Drawing.Point(668, 440);
             this.btnLookAtSelection.Name = "btnLookAtSelection";
             this.btnLookAtSelection.Size = new System.Drawing.Size(112, 20);
-            this.btnLookAtSelection.TabIndex = 6;
+            this.btnLookAtSelection.TabIndex = 7;
             this.btnLookAtSelection.Text = "Look at selection";
             this.btnLookAtSelection.UseVisualStyleBackColor = true;
             this.btnLookAtSelection.Click += new System.EventHandler(this.btnCameraLookAt_Click);
@@ -445,7 +445,7 @@ namespace Diplom
             this.modelViewerControl.Location = new System.Drawing.Point(0, 0);
             this.modelViewerControl.Name = "modelViewerControl";
             this.modelViewerControl.Size = new System.Drawing.Size(764, 376);
-            this.modelViewerControl.TabIndex = 1;
+            this.modelViewerControl.TabIndex = 0;
             this.modelViewerControl.Text = "modelViewerControl";
             this.modelViewerControl.KeyDown += new System.Windows.Forms.KeyEventHandler(this.modelViewerControl_KeyDown);
             this.modelViewerControl.MouseDown += new System.Windows.Forms.MouseEventHandler(this.modelViewerControl_MouseDown);
