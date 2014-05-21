@@ -66,6 +66,33 @@ namespace Diplom.SceneHelpers
             _vertexData[2] = new VertexPositionColor(ThirdVertex, Color.White);
         }
 
+        public ControlTriangle(ControlEdge edge1, ControlEdge edge2, ControlEdge edge3)
+            : this()
+        {
+            List<Vector3> temp = new List<Vector3>();
+
+            if (!temp.Contains(edge1.FirstVertex))
+                temp.Add(edge1.FirstVertex);
+            if (!temp.Contains(edge1.SecondVertex))
+                temp.Add(edge1.SecondVertex);
+            if (!temp.Contains(edge2.FirstVertex))
+                temp.Add(edge2.FirstVertex);
+            if (!temp.Contains(edge2.SecondVertex))
+                temp.Add(edge2.SecondVertex);
+            if (!temp.Contains(edge3.FirstVertex))
+                temp.Add(edge3.FirstVertex);
+            if (!temp.Contains(edge3.SecondVertex))
+                temp.Add(edge3.SecondVertex);
+
+            FirstVertex = temp[0];
+            SecondVertex = temp[1];
+            ThirdVertex = temp[2];
+
+            _vertexData[0] = new VertexPositionColor(FirstVertex, Color.White);
+            _vertexData[1] = new VertexPositionColor(SecondVertex, Color.White);
+            _vertexData[2] = new VertexPositionColor(ThirdVertex, Color.White);
+        }
+
         [OnDeserialized]
         void OnDeserialized(StreamingContext c)
         {

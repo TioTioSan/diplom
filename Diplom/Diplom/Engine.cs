@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework;
 using Diplom.SceneHelpers;
+using Diplom.Primitives;
 
 namespace Diplom
 {
@@ -87,6 +88,8 @@ namespace Diplom
         public static List<ControlVertex> VertexSelectionPool = new List<ControlVertex>();
         public static List<ControlEdge> EdgeSelectionPool = new List<ControlEdge>();
         public static List<ControlTriangle> TriangleSelectionPool = new List<ControlTriangle>();
+
+        public static PrimitiveBase LastAddedPrimitive = null;
 
 
         public static void Draw(Camera camera)

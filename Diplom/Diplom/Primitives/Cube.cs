@@ -120,5 +120,10 @@ namespace Diplom.Primitives
                     new VertexPositionNormalTexture(_vertexPositions[7], _normals[5], _textureCoords[2])
                 };
         }
+
+        public override PrimitiveBase CreateNew()
+        {
+            return new Cube();
+        }
     }
 }

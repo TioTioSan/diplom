@@ -33,5 +33,10 @@ namespace Diplom.Primitives
 
         protected int _primitiveCount;
         public int PrimitiveCount { get { return _primitiveCount; } }
+
+        public virtual PrimitiveBase CreateNew()
+        {
+            return this;
+        }
     }
 }

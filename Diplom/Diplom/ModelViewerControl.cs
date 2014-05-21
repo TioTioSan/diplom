@@ -70,13 +70,14 @@ namespace Diplom
                 DrawSelectionRect();
         }
 
-        public void AddNewSceneEntity()
+        public void AddNewSceneEntity(PrimitiveBase prim)
         {
             if (Engine.StartSceneState == null)
             {
                 Engine.StartAction(ActionType.EntityCount);
-                Engine.SceneEntities.Add(new SceneEntity(new Cube()));
+                Engine.SceneEntities.Add(new SceneEntity(prim));
                 Engine.EndAction();
+                Engine.LastAddedPrimitive = prim;
             }
         }
 
@@ -88,7 +89,7 @@ namespace Diplom
             _selectionRect.X = x;
             _selectionRect.Y = y;
 
-            _controlAxis.MouseDown(new Vector2((float)x, (float)y));
+            _controlAxis.MouseDown();
         }
 
         public void MyLeftMouseUp(int x, int y)
@@ -125,7 +126,7 @@ namespace Diplom
             if (Engine.ActiveControlAxis.IsTransforming)
                 Transformer.ResetDeltas();
 
-            Engine.ActiveControlAxis.MouseUp(new Vector2((float)x, (float)y));
+            Engine.ActiveControlAxis.MouseUp();
 
             if (deltaX == 0 && deltaY == 0)
                 MyMouseClick(_mouseLeftDownX, _mouseLeftDownY);

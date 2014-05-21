@@ -31,6 +31,7 @@ namespace Diplom.SceneHelpers
 
             _lastIntersectionPosition = _intersectPosition;
 
+            #region switch
             switch (Engine.ActiveControlAxis.ActiveAxis)
             {
                 case Axis.XY:
@@ -97,7 +98,8 @@ namespace Diplom.SceneHelpers
                         delta = new Vector3(_tDelta.X, 0, _tDelta.Z);
                     }
                     break;
-            }
+            } 
+            #endregion
 
             Engine.ActiveControlAxis.Translate(delta);
 

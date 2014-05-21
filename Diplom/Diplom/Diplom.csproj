@@ -77,12 +77,21 @@
     <Compile Include="Camera.cs" />
     <Compile Include="ContentBuilder.cs" />
     <Compile Include="ContentLoader.cs" />
+    <Compile Include="Forms\MakeVertexForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\MakeVertexForm.Designer.cs">
+      <DependentUpon>MakeVertexForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\PleaseWaitForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\PleaseWaitForm.Designer.cs">
       <DependentUpon>PleaseWaitForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Primitives\Sphere.cs" />
+    <Compile Include="Primitives\Cylinder.cs" />
+    <Compile Include="Primitives\Plane.cs" />
     <Compile Include="SceneEntityData.cs" />
     <Compile Include="Extentions.cs" />
     <Compile Include="SceneState.cs" />
@@ -109,13 +118,16 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Primitives\Cube.cs" />
-    <Compile Include="Primitives\Primitive.cs" />
+    <Compile Include="Primitives\PrimitiveBase.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SceneHelpers\IndexedVertexModel.cs" />
     <Compile Include="SceneHelpers\Selector.cs" />
     <Compile Include="SceneHelpers\Transformer.cs" />
     <Compile Include="Utils.cs" />
+    <EmbeddedResource Include="Forms\MakeVertexForm.resx">
+      <DependentUpon>MakeVertexForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\PleaseWaitForm.resx">
       <DependentUpon>PleaseWaitForm.cs</DependentUpon>
     </EmbeddedResource>

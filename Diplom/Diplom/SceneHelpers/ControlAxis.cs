@@ -39,6 +39,7 @@ namespace Diplom.SceneHelpers
         private float _screenScale;
 
         private bool _isTransforming = false;
+        public bool IsTransforming { get { return _isTransforming; } }
 
         public Vector3 X_AxisDirection { get; private set; }
         public Vector3 Y_AxisDirection { get; private set; }
@@ -195,8 +196,6 @@ namespace Diplom.SceneHelpers
             }
         }
 
-        public bool IsTransforming { get { return _isTransforming; } }
-
 
         public ControlAxis()
         {
@@ -287,7 +286,7 @@ namespace Diplom.SceneHelpers
         }
 
         #region Mouse events
-        public void MouseDown(Vector2 position)
+        public void MouseDown()
         {
             if (!IsEnabled) return;
 
@@ -298,7 +297,7 @@ namespace Diplom.SceneHelpers
             }
         }
 
-        public void MouseUp(Vector2 position)
+        public void MouseUp()
         {
             if (!IsEnabled) return;
 

@@ -58,7 +58,6 @@ namespace Diplom
             this.label3 = new System.Windows.Forms.Label();
             this.cmbDraw = new System.Windows.Forms.ComboBox();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.modelViewerControl = new Diplom.ModelViewerControl();
             this.nudX = new System.Windows.Forms.NumericUpDown();
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
@@ -66,6 +65,7 @@ namespace Diplom
             this.labelZ = new System.Windows.Forms.Label();
             this.nudZ = new System.Windows.Forms.NumericUpDown();
             this.btnLookAtSelection = new System.Windows.Forms.Button();
+            this.modelViewerControl = new Diplom.ModelViewerControl();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudX)).BeginInit();
@@ -229,26 +229,30 @@ namespace Diplom
             // PlaneToolStripMenuItem
             // 
             this.PlaneToolStripMenuItem.Name = "PlaneToolStripMenuItem";
-            this.PlaneToolStripMenuItem.Size = new System.Drawing.Size(118, 22);
+            this.PlaneToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.PlaneToolStripMenuItem.Text = "Plane";
+            this.PlaneToolStripMenuItem.Click += new System.EventHandler(this.PlaneToolStripMenuItem_Click);
             // 
             // CubeToolStripMenuItem
             // 
             this.CubeToolStripMenuItem.Name = "CubeToolStripMenuItem";
-            this.CubeToolStripMenuItem.Size = new System.Drawing.Size(118, 22);
+            this.CubeToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.CubeToolStripMenuItem.Text = "Cube";
+            this.CubeToolStripMenuItem.Click += new System.EventHandler(this.CubeToolStripMenuItem_Click);
             // 
             // CylinderToolStripMenuItem
             // 
             this.CylinderToolStripMenuItem.Name = "CylinderToolStripMenuItem";
-            this.CylinderToolStripMenuItem.Size = new System.Drawing.Size(118, 22);
+            this.CylinderToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.CylinderToolStripMenuItem.Text = "Cylinder";
+            this.CylinderToolStripMenuItem.Click += new System.EventHandler(this.CylinderToolStripMenuItem_Click);
             // 
             // SphereToolStripMenuItem
             // 
             this.SphereToolStripMenuItem.Name = "SphereToolStripMenuItem";
-            this.SphereToolStripMenuItem.Size = new System.Drawing.Size(118, 22);
+            this.SphereToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.SphereToolStripMenuItem.Text = "Sphere";
+            this.SphereToolStripMenuItem.Click += new System.EventHandler(this.SphereToolStripMenuItem_Click);
             // 
             // label1
             // 
@@ -332,19 +336,6 @@ namespace Diplom
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(768, 380);
             this.panel1.TabIndex = 4;
-            // 
-            // modelViewerControl
-            // 
-            this.modelViewerControl.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.modelViewerControl.Location = new System.Drawing.Point(0, 0);
-            this.modelViewerControl.Name = "modelViewerControl";
-            this.modelViewerControl.Size = new System.Drawing.Size(764, 376);
-            this.modelViewerControl.TabIndex = 1;
-            this.modelViewerControl.Text = "modelViewerControl";
-            this.modelViewerControl.KeyDown += new System.Windows.Forms.KeyEventHandler(this.modelViewerControl_KeyDown);
-            this.modelViewerControl.MouseDown += new System.Windows.Forms.MouseEventHandler(this.modelViewerControl_MouseDown);
-            this.modelViewerControl.MouseMove += new System.Windows.Forms.MouseEventHandler(this.modelViewerControl_MouseMove);
-            this.modelViewerControl.MouseUp += new System.Windows.Forms.MouseEventHandler(this.modelViewerControl_MouseUp);
             // 
             // nudX
             // 
@@ -447,6 +438,19 @@ namespace Diplom
             this.btnLookAtSelection.Text = "Look at selection";
             this.btnLookAtSelection.UseVisualStyleBackColor = true;
             this.btnLookAtSelection.Click += new System.EventHandler(this.btnCameraLookAt_Click);
+            // 
+            // modelViewerControl
+            // 
+            this.modelViewerControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.modelViewerControl.Location = new System.Drawing.Point(0, 0);
+            this.modelViewerControl.Name = "modelViewerControl";
+            this.modelViewerControl.Size = new System.Drawing.Size(764, 376);
+            this.modelViewerControl.TabIndex = 1;
+            this.modelViewerControl.Text = "modelViewerControl";
+            this.modelViewerControl.KeyDown += new System.Windows.Forms.KeyEventHandler(this.modelViewerControl_KeyDown);
+            this.modelViewerControl.MouseDown += new System.Windows.Forms.MouseEventHandler(this.modelViewerControl_MouseDown);
+            this.modelViewerControl.MouseMove += new System.Windows.Forms.MouseEventHandler(this.modelViewerControl_MouseMove);
+            this.modelViewerControl.MouseUp += new System.Windows.Forms.MouseEventHandler(this.modelViewerControl_MouseUp);
             // 
             // MainForm
             // 

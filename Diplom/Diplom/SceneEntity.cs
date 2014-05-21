@@ -97,6 +97,14 @@ namespace Diplom
                 _controlTriangles.Add(new ControlTriangle(_vertexPositions[tuple.Item1], _vertexPositions[tuple.Item2], _vertexPositions[tuple.Item3]));
             }
 
+            if (primitive is Cylinder || primitive is Sphere)
+            {
+                var t = _vertexPositions.ToList();
+                t.RemoveAt(0);
+                _vertexPositions = t.ToArray();
+                _controlVertices.RemoveAt(0);
+            }
+
             RecalcCenter();
             RecalcBoundingBox();
         }
@@ -885,6 +893,38 @@ namespace Diplom
             RecalcCenter();
             Engine.ActiveControlAxis.Position = _center;
         }
+
+        public void MakeVertex(Vector3 pos)
+        {
+            if (_controlVertices.Any(x => x.Position == pos)) return;
+
+            var cv = new ControlVertex(pos);
+            _controlVertices.Add(cv);
+            var t = _vertexPositions.ToList();
+            t.Add(pos);
+            _vertexPositions = t.ToArray();
+
+            RecalcBoundingBox();
+        }
+
+        public void MakeEdge()
+        {
+            _controlEdges.Add(new ControlEdge(Engine.VertexSelectionPool[0].Position, Engine.VertexSelectionPool[1].Position));
+        }
+
+        public void MakeTriangle()
+        {
+            var tri = new ControlTriangle(Engine.EdgeSelectionPool[0], Engine.EdgeSelectionPool[1], Engine.EdgeSelectionPool[2]);
+            Vector3 normal = Vector3.Cross(tri.SecondVertex - tri.FirstVertex, tri.ThirdVertex - tri.FirstVertex);
+            _controlTriangles.Add(tri);
+            var t = _vertexData.ToList();
+            t.Add(new VertexPositionNormalTexture(tri.FirstVertex, normal, Vector2.Zero));
+            t.Add(new VertexPositionNormalTexture(tri.SecondVertex, normal, Vector2.Zero));
+            t.Add(new VertexPositionNormalTexture(tri.ThirdVertex, normal, Vector2.Zero));
+            _vertexData = t.ToArray();
+            _primitiveCount++;
+        }
+
 
         private void DrawConrtolVertices()
         {

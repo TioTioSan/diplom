@@ -83,7 +83,7 @@ namespace Diplom
             cmbTransform.SelectedIndex = (int)TransformationMode.Translate;
             cmbDraw.SelectedIndex = (int)DrawMode.EntityOnly;
 
-            modelViewerControl.AddNewSceneEntity();
+            modelViewerControl.AddNewSceneEntity(new Cube());
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -93,7 +93,7 @@ namespace Diplom
                     e.Cancel = true;
         }
 
-        #region Menu clicks
+        #region Menu
         private void ExitMenuClicked(object sender, EventArgs e)
         {
             Close();
@@ -190,17 +190,68 @@ namespace Diplom
 
         private void MakeVertexToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            using (MakeVertexForm mvf = new MakeVertexForm())
+            {
+                if (mvf.ShowDialog() == DialogResult.OK)
+                {
+                    Engine.StartAction(ActionType.VertexData);
+                    Engine.EntitySelectionPool[0].MakeVertex(mvf.result);
+                    Engine.EndAction();
+                }
+            }
         }
 
         private void MakeEdgeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            Engine.StartAction(ActionType.VertexData);
+            Engine.EntitySelectionPool[0].MakeEdge();
+            Engine.EndAction();
         }
 
         private void MakeTriangleToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            Engine.StartAction(ActionType.VertexData);
+            Engine.EntitySelectionPool[0].MakeTriangle();
+            Engine.EndAction();
+        }
 
+
+        private void PlaneToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            modelViewerControl.AddNewSceneEntity(new Plane());
+        }
+
+        private void CubeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            modelViewerControl.AddNewSceneEntity(new Cube());
+        }
+
+        private void CylinderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Cursor.Current = Cursors.WaitCursor;
+            using (PleaseWaitForm pwf = new PleaseWaitForm())
+            {
+                pwf.Location = new Point(this.Location.X + this.Width / 2 - pwf.Width / 2,
+                                        this.Location.Y + this.Height / 2 - pwf.Height / 2);
+                pwf.Show();
+                pwf.Update();
+                modelViewerControl.AddNewSceneEntity(new Cylinder());
+            }
+            Cursor.Current = Cursors.Default;
+        }
+
+        private void SphereToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Cursor.Current = Cursors.WaitCursor;
+            using (PleaseWaitForm pwf = new PleaseWaitForm())
+            {
+                pwf.Location = new Point(this.Location.X + this.Width / 2 - pwf.Width / 2,
+                                        this.Location.Y + this.Height / 2 - pwf.Height / 2);
+                pwf.Show();
+                pwf.Update();
+                modelViewerControl.AddNewSceneEntity(new Sphere());
+            }
+            Cursor.Current = Cursors.Default;
         }
         #endregion
 
@@ -264,9 +315,10 @@ namespace Diplom
         {
             modelViewerControl.MyKeyDown(e);
 
-            //temp
             if (e.KeyCode == Keys.A)
-                modelViewerControl.AddNewSceneEntity();
+            {
+                modelViewerControl.AddNewSceneEntity(Engine.LastAddedPrimitive.CreateNew());
+            }
         }
 
         private void modelViewerControl_KeyDown(object sender, KeyEventArgs e)
@@ -450,12 +502,12 @@ namespace Diplom
             {
                 sb.AppendLine("o entity_" + entity.Id);
 
-                foreach (var vert in entity.VertexPositions)
+                foreach (var vert in entity.VertexData)
                 {
-                    if (!verts.Contains(vert))
+                    if (!verts.Contains(vert.Position))
                     {
-                        verts.Add(vert);
-                        sb.Append("v ").Append(Math.Round(vert.X, 6)).Append(" ").Append(Math.Round(vert.Y, 6)).Append(" ").Append(Math.Round(vert.Z, 6)).AppendLine();
+                        verts.Add(vert.Position);
+                        sb.Append("v ").Append(Math.Round(vert.Position.X, 6)).Append(" ").Append(Math.Round(vert.Position.Y, 6)).Append(" ").Append(Math.Round(vert.Position.Z, 6)).AppendLine();
                     }
                 }
 
@@ -521,6 +573,5 @@ namespace Diplom
             nudZ.Value = 0;
             isDrag = false;
         }
-
     }
 }

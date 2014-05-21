@@ -112,7 +112,7 @@ namespace Diplom.SceneHelpers
         public bool Select(Ray ray)
         {
             Vector3 crossVector = Vector3.Cross(FirstVertex - SecondVertex, ray.Position - SecondVertex);
-            Plane plane = new Plane(FirstVertex, SecondVertex, crossVector + SecondVertex);
+            Microsoft.Xna.Framework.Plane plane = new Microsoft.Xna.Framework.Plane(FirstVertex, SecondVertex, crossVector + SecondVertex);
             float? dist = ray.Intersects(plane);
 
             if (!dist.HasValue)
