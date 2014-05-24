@@ -19,6 +19,7 @@ namespace Diplom
         private ControlAxis _controlAxis;
         private Camera _camera;
         private SpriteBatch _spriteBatch;
+        private Color _backGroundColor = new Color(255, 255, 255);
 
         private int _mouseLeftDownX, _mouseLeftDownY;
         private static Rectangle _selectionRect = new Rectangle(-1, -1, 0, 0);
@@ -57,7 +58,7 @@ namespace Diplom
         protected override void Draw()
         {
             // Clear to the default control background color.
-            GraphicsDevice.Clear(new Color(BackColor.R, BackColor.G, BackColor.B));
+            GraphicsDevice.Clear(_backGroundColor);
 
             if (GraphicsDevice.Viewport.AspectRatio != Engine.ActiveCamera.AspectRatio)
                 Engine.ActiveCamera.AspectRatio = GraphicsDevice.Viewport.AspectRatio;

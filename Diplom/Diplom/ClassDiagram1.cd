@@ -23,7 +23,11 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Diplom.Engine">
-    <Position X="17.25" Y="8" Width="1.5" />
+    <Position X="21.25" Y="7.75" Width="2" />
+    <Compartments>
+      <Compartment Name="Properties" Collapsed="true" />
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
     <TypeIdentifier>
       <HashCode>AgQAAQABAAiCBgkiAAAwAMADAAUAghAGYCIAQIAANAA=</HashCode>
       <FileName>Engine.cs</FileName>
@@ -62,12 +66,12 @@
   <Class Name="Diplom.ModelViewerControl">
     <Position X="3.25" Y="6.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>gAEEgAAIAIAAAwAAAAAQGCAAAAAABQAAAIIBACAgAIA=</HashCode>
+      <HashCode>gAEGgAAIAIAAAwAAAAAQGCAAAAAABQAAAIIBACAgAIA=</HashCode>
       <FileName>ModelViewerControl.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Diplom.SceneEntity">
-    <Position X="19" Y="4.5" Width="1.5" />
+    <Position X="19" Y="4.5" Width="2" />
     <TypeIdentifier>
       <HashCode>AIADgIFACCAEQkAgAAbQNBFBEKAhwAJIABAFyAWKQAA=</HashCode>
       <FileName>SceneEntity.cs</FileName>
