@@ -38,7 +38,7 @@ namespace Diplom
             farClip = 20000f;
 
             rotationSpeed = 0.01f;
-            translationSpeed = 0.1f;
+            translationSpeed = 0.05f;
             zoomSpeed = 0.05f;
 
             this.aspectRatio = aspectRatio;

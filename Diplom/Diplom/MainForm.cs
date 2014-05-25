@@ -45,7 +45,13 @@ namespace Diplom
         public bool IsEnabledSubObjCmbBox
         {
             get { return cmbSubObject.Enabled; }
-            set { cmbSubObject.Enabled = value; }
+            set 
+            { 
+                cmbSubObject.Enabled = value;
+                nudX.Enabled = value;
+                nudY.Enabled = value;
+                nudZ.Enabled = value;
+            }
         }
 
         public bool IsEnabledBntLookAtSelection
@@ -212,6 +218,7 @@ namespace Diplom
             Engine.StartAction(ActionType.VertexData);
             Engine.EntitySelectionPool[0].MakeEdge();
             Engine.EndAction();
+            IsEnabledMakeEdge = false;
         }
 
         private void MakeTriangleToolStripMenuItem_Click(object sender, EventArgs e)
@@ -219,6 +226,7 @@ namespace Diplom
             Engine.StartAction(ActionType.VertexData);
             Engine.EntitySelectionPool[0].MakeTriangle();
             Engine.EndAction();
+            IsEnabledMakeTriangle = false;
         }
 
 
@@ -382,6 +390,59 @@ namespace Diplom
                 }
                 #endregion
             }
+
+            #region Deleting
+            if (e.KeyCode == Keys.Delete)
+            {
+                if (Engine.EntitySelectionPool.Count == 0) return;
+
+                switch (Engine.ActiveSubObjectMode)
+                {
+                    case SubObjectMode.None:
+                        Engine.StartAction(ActionType.EntityCount);
+                        foreach (var item in Engine.EntitySelectionPool)
+                            Engine.SceneEntities.Remove(item);
+                        Engine.EntitySelectionPool.Clear();
+                        Engine.SelectionChanged();
+                        Engine.EndAction();
+                        break;
+                    case SubObjectMode.Vertex:
+                        if (Engine.VertexSelectionPool.Count != 0)
+                        {
+                            Engine.StartAction(ActionType.VertexData);
+                            foreach (var item in Engine.EntitySelectionPool)
+                                item.DeleteVertex();
+                            Engine.VertexSelectionPool.Clear();
+                            Engine.SelectionChanged();
+                            Engine.EndAction();
+                        }
+                        break;
+                    case SubObjectMode.Edge:
+                        if (Engine.EdgeSelectionPool.Count != 0)
+                        {
+                            Engine.StartAction(ActionType.VertexData);
+                            foreach (var item in Engine.EntitySelectionPool)
+                                item.DeleteEdge();
+                            Engine.EdgeSelectionPool.Clear();
+                            Engine.SelectionChanged();
+                            Engine.EndAction();
+                        }
+                        break;
+                    case SubObjectMode.Triangle:
+                        if (Engine.TriangleSelectionPool.Count != 0)
+                        {
+                            Engine.StartAction(ActionType.VertexData);
+                            foreach (var item in Engine.EntitySelectionPool)
+                                item.DeleteTriangle();
+                            Engine.TriangleSelectionPool.Clear();
+                            Engine.SelectionChanged();
+                            Engine.EndAction();
+                        }
+                        break;
+                }
+            }
+            #endregion
+
             e.Handled = true;
         }
 

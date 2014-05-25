@@ -8,11 +8,6 @@ using Diplom.Primitives;
 
 namespace Diplom
 {
-    /// <summary>
-    /// Example control inherits from GraphicsDeviceControl, and displays
-    /// a spinning 3D model. The main form class is responsible for loading
-    /// the model: this control just displays it.
-    /// </summary>
     class ModelViewerControl : GraphicsDeviceControl
     {
         private SnapGrid _snapGrid;
@@ -198,58 +193,6 @@ namespace Diplom
                 if (Engine.ActiveControlAxis.IsEnabled)
                     Engine.ActiveCamera.LookAtSelection();
             }
-
-            #region Deleting
-            if (e.KeyCode == Keys.Delete)
-            {
-                if (Engine.EntitySelectionPool.Count == 0) return;
-
-                switch (Engine.ActiveSubObjectMode)
-                {
-                    case SubObjectMode.None:
-                        Engine.StartAction(ActionType.EntityCount);
-                        foreach (var item in Engine.EntitySelectionPool)
-                            Engine.SceneEntities.Remove(item);
-                        Engine.EntitySelectionPool.Clear();
-                        Engine.SelectionChanged();
-                        Engine.EndAction();
-                        break;
-                    case SubObjectMode.Vertex:
-                        if (Engine.VertexSelectionPool.Count != 0)
-                        {
-                            Engine.StartAction(ActionType.VertexData);
-                            foreach (var item in Engine.EntitySelectionPool)
-                                item.DeleteVertex();
-                            Engine.VertexSelectionPool.Clear();
-                            Engine.SelectionChanged();
-                            Engine.EndAction();
-                        }
-                        break;
-                    case SubObjectMode.Edge:
-                        if (Engine.EdgeSelectionPool.Count != 0)
-                        {
-                            Engine.StartAction(ActionType.VertexData);
-                            foreach (var item in Engine.EntitySelectionPool)
-                                item.DeleteEdge();
-                            Engine.EdgeSelectionPool.Clear();
-                            Engine.SelectionChanged();
-                            Engine.EndAction();
-                        }
-                        break;
-                    case SubObjectMode.Triangle:
-                        if (Engine.TriangleSelectionPool.Count != 0)
-                        {
-                            Engine.StartAction(ActionType.VertexData);
-                            foreach (var item in Engine.EntitySelectionPool)
-                                item.DeleteTriangle();
-                            Engine.TriangleSelectionPool.Clear();
-                            Engine.SelectionChanged();
-                            Engine.EndAction();
-                        }
-                        break;
-                }
-            }
-            #endregion
         }
 
 
