@@ -1,113 +1,28 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
-  <Class Name="Diplom.Camera">
-    <Position X="5" Y="11" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAEAAKIAAAIgAwAAAgkAQAIAAAAAAgBQgQgAQgI=</HashCode>
-      <FileName>Camera.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Diplom.ContentBuilder" BaseTypeListCollapsed="true">
-    <Position X="13.75" Y="10" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>EAIAAAABACUAABAAEAAAAAAOEAgFgAAAkIAAAEBAAAA=</HashCode>
-      <FileName>ContentBuilder.cs</FileName>
-    </TypeIdentifier>
-    <Lollipop Position="0.2" Collapsed="true" />
-  </Class>
-  <Class Name="Diplom.ContentLoader">
-    <Position X="3.25" Y="12.25" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAEAAiYAgAAAAAACAAKAAAAAAAIAAKgAAAAAAAAAgg=</HashCode>
-      <FileName>ContentLoader.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Diplom.Engine">
-    <Position X="21.25" Y="7.75" Width="2" />
-    <Compartments>
-      <Compartment Name="Properties" Collapsed="true" />
-      <Compartment Name="Fields" Collapsed="true" />
-    </Compartments>
-    <TypeIdentifier>
-      <HashCode>AgQAAQABAAiCBgkiAAAwAMADAAUAghAGYCIAQIAANAA=</HashCode>
-      <FileName>Engine.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Diplom.ErrorLogger" BaseTypeListCollapsed="true">
-    <Position X="8.5" Y="12.5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAACAAAAQAAAAMAAQAAAAACAAAAAAAAAAKAAAA=</HashCode>
-      <FileName>ErrorLogger.cs</FileName>
-    </TypeIdentifier>
-    <Lollipop Position="0.2" Collapsed="true" />
-  </Class>
-  <Class Name="Diplom.Extentions">
-    <Position X="10.25" Y="13.5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Extentions.cs</FileName>
-    </TypeIdentifier>
-  </Class>
   <Class Name="Diplom.GraphicsDeviceControl">
-    <Position X="5" Y="6.5" Width="1.5" />
+    <Position X="6.25" Y="7" Width="1.5" />
     <TypeIdentifier>
       <HashCode>gQCAoAAAACAAAwAAAAABAAAAAAAAAAAAAAAEAIAABAA=</HashCode>
       <FileName>GraphicsDeviceControl.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Diplom.GraphicsDeviceService" BaseTypeListCollapsed="true">
-    <Position X="12" Y="8" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>BAAAAAAAgAAABAAAAAAQAIAAAACAABQgAAAEABCAAAA=</HashCode>
-      <FileName>GraphicsDeviceService.cs</FileName>
-    </TypeIdentifier>
-    <Lollipop Position="0.2" Collapsed="true" />
-  </Class>
   <Class Name="Diplom.ModelViewerControl">
-    <Position X="3.25" Y="6.5" Width="1.5" />
+    <Position X="3.75" Y="7" Width="1.5" />
     <TypeIdentifier>
       <HashCode>gAEGgAAIAIAAAwAAAAAQGCAAAAAABQAAAIIBACAgAIA=</HashCode>
       <FileName>ModelViewerControl.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Diplom.SceneEntity">
-    <Position X="19" Y="4.5" Width="2" />
-    <TypeIdentifier>
-      <HashCode>AIADgIFACCAEQkAgAAbQNBFBEKAhwAJIABAFyAWKQAA=</HashCode>
-      <FileName>SceneEntity.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Diplom.SceneState">
-    <Position X="17.25" Y="4.5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAIAAAAAAAAAgAAAASAIAAAAAAEAAAQCAAAIAAAAA=</HashCode>
-      <FileName>SceneState.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Diplom.ServiceContainer" BaseTypeListCollapsed="true">
-    <Position X="15.5" Y="9.25" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKAAAEA=</HashCode>
-      <FileName>ServiceContainer.cs</FileName>
-    </TypeIdentifier>
-    <Lollipop Position="0.2" Collapsed="true" />
-  </Class>
-  <Class Name="Diplom.Utils">
-    <Position X="1.5" Y="12.25" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>ACBAAAAAAAAAAAAQCAAAAAQAIAAAAAFAACAAAIAAAAA=</HashCode>
-      <FileName>Utils.cs</FileName>
-    </TypeIdentifier>
-  </Class>
   <Class Name="Diplom.Primitives.Cube">
-    <Position X="5" Y="4.5" Width="1.5" />
+    <Position X="6.25" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Primitives\Cube.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Diplom.Primitives.Cylinder">
-    <Position X="6.75" Y="4.5" Width="1.5" />
+    <Position X="9" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Primitives\Cylinder.cs</FileName>
@@ -121,136 +36,81 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Diplom.Primitives.PrimitiveBase">
-    <Position X="6.75" Y="6.5" Width="1.5" />
+    <Position X="1.5" Y="7" Width="1.5" />
     <TypeIdentifier>
       <HashCode>gAACgAAAEAAAAAEAAAAAAghAACAAQAgMAAAECAAIQAA=</HashCode>
       <FileName>Primitives\PrimitiveBase.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Diplom.Primitives.Sphere">
-    <Position X="3.25" Y="4.5" Width="1.5" />
+    <Position X="3.75" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Primitives\Sphere.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Diplom.Properties.Settings">
-    <Position X="13.75" Y="8" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAIAAAAAABAAAAAAAAAAAAAAA=</HashCode>
-    </TypeIdentifier>
-  </Class>
   <Class Name="Diplom.SceneHelpers.ControlEdge">
-    <Position X="1.5" Y="6.5" Width="1.5" />
+    <Position X="14" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAQAAAEAAIAAEgAAAEIAAAJAEAAAAAQABoAEQAAYAAA=</HashCode>
       <FileName>SceneHelpers\ControlEdge.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Diplom.SceneHelpers.ControlTriangle">
-    <Position X="15.5" Y="11.25" Width="1.5" />
+    <Position X="16.5" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AEQAAAEAAIAAEgAAAEIAAAJAEAAAAAQABgAEAAAYAAA=</HashCode>
       <FileName>SceneHelpers\ControlTriangle.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Diplom.SceneHelpers.ControlVertex">
-    <Position X="6.75" Y="11.5" Width="1.5" />
+    <Position X="11.5" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAEAAIAAEgAgAEIAAAAAECAAAAQABgAEAAAAAAA=</HashCode>
       <FileName>SceneHelpers\ControlVertex.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Diplom.SceneHelpers.SnapGrid">
-    <Position X="8.5" Y="8.25" Width="1.5" />
+  <Class Name="Diplom.SceneState">
+    <Position X="11.5" Y="10" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAoAAAEAAAAAAAAAAAAICBgAEAAAAQAA=</HashCode>
-      <FileName>SceneHelpers\GridComponent.cs</FileName>
+      <HashCode>AAAAIAAAAAAAAAgAAAASAIAAAAAAEAAAQCAAAIAAAAA=</HashCode>
+      <FileName>SceneState.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Diplom.SceneHelpers.HelpersGeometry">
-    <Position X="12" Y="12.5" Width="1.5" />
+  <Class Name="Diplom.Utils">
+    <Position X="14" Y="10.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAgAAAAIAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>SceneHelpers\HelpersGeometry.cs</FileName>
+      <HashCode>ACBAAAAAAAAAAAAQCAAAAAQAIAAAAAFAACAAAIAAAAA=</HashCode>
+      <FileName>Utils.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Diplom.SceneHelpers.Selector">
-    <Position X="10.25" Y="10.5" Width="1.5" />
+    <Position X="16.5" Y="10.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AIAAAAgAAAAACAAAAAAAAACABQAAAAAgwAAAAAAAAAA=</HashCode>
       <FileName>SceneHelpers\Selector.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Diplom.SceneHelpers.Transformer">
-    <Position X="15.5" Y="4.5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAgCACAIIAAAAAEAAAAAQAAAAEAAAACAA=</HashCode>
-      <FileName>SceneHelpers\Transformer.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Struct Name="Diplom.SceneEntityData">
-    <Position X="10.25" Y="4.5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAACgAAAAAAAEAAgAAAACCAAAAAAAAQAAAAACAAIQAA=</HashCode>
-      <FileName>SceneEntityData.cs</FileName>
-    </TypeIdentifier>
-  </Struct>
   <Struct Name="Diplom.Vert">
-    <Position X="13.75" Y="4.5" Width="1.5" />
+    <Position X="9" Y="9.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Utils.cs</FileName>
     </TypeIdentifier>
   </Struct>
   <Struct Name="Diplom.Edge">
-    <Position X="8.5" Y="4.5" Width="1.5" />
+    <Position X="9" Y="7" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAQAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Utils.cs</FileName>
     </TypeIdentifier>
   </Struct>
   <Struct Name="Diplom.Trian">
-    <Position X="12" Y="4.5" Width="1.5" />
+    <Position X="9" Y="12.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AEQAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Utils.cs</FileName>
     </TypeIdentifier>
   </Struct>
-  <Enum Name="Diplom.Axis">
-    <Position X="10.25" Y="8" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAQAAAAAAAAIAAAAAgAAAAAAAAAAAAAEAYAE=</HashCode>
-      <FileName>Enums.cs</FileName>
-    </TypeIdentifier>
-  </Enum>
-  <Enum Name="Diplom.TransformationMode">
-    <Position X="15.5" Y="7.75" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAIAAAAAEAAAAAAAAAAEAAAAAAA=</HashCode>
-      <FileName>Enums.cs</FileName>
-    </TypeIdentifier>
-  </Enum>
-  <Enum Name="Diplom.SubObjectMode">
-    <Position X="13.75" Y="6.25" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAABAAABAAAAAAAAAAAABAAAAAAAAAEAAAA=</HashCode>
-      <FileName>Enums.cs</FileName>
-    </TypeIdentifier>
-  </Enum>
-  <Enum Name="Diplom.DrawMode">
-    <Position X="12" Y="6.75" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAI=</HashCode>
-      <FileName>Enums.cs</FileName>
-    </TypeIdentifier>
-  </Enum>
-  <Enum Name="Diplom.ActionType">
-    <Position X="8.5" Y="6.5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAABAAAAAAAABAAAAAAAAAAAAAAQAQAA=</HashCode>
-      <FileName>Enums.cs</FileName>
-    </TypeIdentifier>
-  </Enum>
   <Font Name="Segoe UI" Size="9" />
 </ClassDiagram>

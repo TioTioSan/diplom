@@ -965,7 +965,7 @@ namespace Diplom
 
         private void RecreateSelectionBox()
         {
-            Color lineColor = Color.White;
+            Color lineColor = new Color(120,120,120);
             const float lineLength = 5f;
 
             _selectionBoxVertices.Clear();
